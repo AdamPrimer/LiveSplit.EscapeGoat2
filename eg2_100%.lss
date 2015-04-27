@@ -467,25 +467,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 7-2</Name>
-        <Icon />
-        <SplitTimes>
-            <SplitTime name="Personal Best" />
-        </SplitTimes>
-        <BestSegmentTime />
-        <SegmentHistory />
-        </Segment>
-    <Segment>
         <Name>Room 7-2 Secret</Name>
-        <Icon />
-        <SplitTimes>
-            <SplitTime name="Personal Best" />
-        </SplitTimes>
-        <BestSegmentTime />
-        <SegmentHistory />
-        </Segment>
-    <Segment>
-        <Name>Room S-10</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -504,6 +486,24 @@
         </Segment>
     <Segment>
         <Name>Room S-11</Name>
+        <Icon />
+        <SplitTimes>
+            <SplitTime name="Personal Best" />
+        </SplitTimes>
+        <BestSegmentTime />
+        <SegmentHistory />
+        </Segment>
+    <Segment>
+        <Name>Room S-10</Name>
+        <Icon />
+        <SplitTimes>
+            <SplitTime name="Personal Best" />
+        </SplitTimes>
+        <BestSegmentTime />
+        <SegmentHistory />
+        </Segment>
+    <Segment>
+        <Name>Room 7-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -629,15 +629,6 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 1-9</Name>
-        <Icon />
-        <SplitTimes>
-            <SplitTime name="Personal Best" />
-        </SplitTimes>
-        <BestSegmentTime />
-        <SegmentHistory />
-        </Segment>
-    <Segment>
         <Name>Room 1-9 Secret</Name>
         <Icon />
         <SplitTimes>
@@ -648,6 +639,15 @@
         </Segment>
     <Segment>
         <Name>Room S-13</Name>
+        <Icon />
+        <SplitTimes>
+            <SplitTime name="Personal Best" />
+        </SplitTimes>
+        <BestSegmentTime />
+        <SegmentHistory />
+        </Segment>
+    <Segment>
+        <Name>Room 1-9</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -773,15 +773,6 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 3-7</Name>
-        <Icon />
-        <SplitTimes>
-            <SplitTime name="Personal Best" />
-        </SplitTimes>
-        <BestSegmentTime />
-        <SegmentHistory />
-        </Segment>
-    <Segment>
         <Name>Room 3-7 Secret</Name>
         <Icon />
         <SplitTimes>
@@ -792,6 +783,15 @@
         </Segment>
     <Segment>
         <Name>Room S-3</Name>
+        <Icon />
+        <SplitTimes>
+            <SplitTime name="Personal Best" />
+        </SplitTimes>
+        <BestSegmentTime />
+        <SegmentHistory />
+        </Segment>
+    <Segment>
+        <Name>Room 3-7</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -872,15 +872,6 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 4-9</Name>
-        <Icon />
-        <SplitTimes>
-            <SplitTime name="Personal Best" />
-        </SplitTimes>
-        <BestSegmentTime />
-        <SegmentHistory />
-        </Segment>
-    <Segment>
         <Name>Room 4-9 Secret</Name>
         <Icon />
         <SplitTimes>
@@ -891,6 +882,15 @@
         </Segment>
     <Segment>
         <Name>Room S-5</Name>
+        <Icon />
+        <SplitTimes>
+            <SplitTime name="Personal Best" />
+        </SplitTimes>
+        <BestSegmentTime />
+        <SegmentHistory />
+        </Segment>
+    <Segment>
+        <Name>Room 4-9</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -1241,15 +1241,6 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 9-1</Name>
-        <Icon />
-        <SplitTimes>
-            <SplitTime name="Personal Best" />
-        </SplitTimes>
-        <BestSegmentTime />
-        <SegmentHistory />
-        </Segment>
-    <Segment>
         <Name>Room 9-1 Secret</Name>
         <Icon />
         <SplitTimes>
@@ -1260,6 +1251,15 @@
         </Segment>
     <Segment>
         <Name>Room S-12</Name>
+        <Icon />
+        <SplitTimes>
+            <SplitTime name="Personal Best" />
+        </SplitTimes>
+        <BestSegmentTime />
+        <SegmentHistory />
+        </Segment>
+    <Segment>
+        <Name>Room 9-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
