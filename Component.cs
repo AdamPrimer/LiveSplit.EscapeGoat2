@@ -77,9 +77,13 @@ namespace LiveSplit.EscapeGoat2
             if (e.name == "Start") {
                 write("[OriSplitter] Start.");
                 Model.Start();
+                _state.IsGameTimePaused = true;
             } else {
                 write("[OriSplitter] Split.");
                 Model.Split();
+
+                Room room = (Room)e.value;
+                write(string.Format("{0} Exited.", room.ToString()));
             }
         }
 
@@ -97,6 +101,7 @@ namespace LiveSplit.EscapeGoat2
 
         void goatState_OnIGTChanged(object sender, EventArgs e) {
             _state.SetGameTime((TimeSpan?)sender);
+            _state.IsGameTimePaused = true;
         }
 
         public override Control GetSettingsControl(LayoutMode mode) {

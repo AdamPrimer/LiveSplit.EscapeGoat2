@@ -77,11 +77,6 @@ namespace LiveSplit.EscapeGoat2.Memory
             return new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "<ActionSceneInstance>k__BackingField");
         }
 
-        public ValuePointer? GetPlayer() {
-            var action = GetActionStage();
-            return action.Value.Value["_player"];
-        }
-
         public bool GetStartOfGame() {
             try {
                 var title = new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "<TitleScreenInstance>k__BackingField");
@@ -121,34 +116,56 @@ namespace LiveSplit.EscapeGoat2.Memory
             return null;
         }
 
-        public bool? GetRoomFrozen() {
-            var roomInstance = GetRoomInstance();
-            if (roomInstance != null) {
-                return roomInstance.Value["_frozen"].Value.Read<Boolean>();
-            }
-            return null;
-        }
-
-        public bool? GetRoomHasRunFirstFrame() {
-            var roomInstance = GetRoomInstance();
-            if (roomInstance != null) {
-                return roomInstance.Value["<HasRunFirstFrame>k__BackingField"].Value.Read<Boolean>();
-            }
-            return null;
-        }
-
-        public bool? GetIsQuittingGame() {
+        public ArrayPointer? GetSheepOrbsArray() {
             var action = GetActionStage();
-            return action.Value.Value["QuitGameFader"].Value["Enabled"].Value.Read<Boolean>();
-        }
-        
-        public bool? GetIsGamePaused() {
-            var action = GetActionStage();
+            var state = action.Value.Value["<GameState>k__BackingField"];
+            if (!state.HasValue) {
+                return null;
+            }
 
-            // Either the pause menu is open, or the fader is transitioning it.
-            return (
-                action.Value.Value["PauseMenu"].Value["Visible"].Value.Read<Boolean>() 
-                || action.Value.Value["StageSelectDecorations"].Value["Fader"].Value["Enabled"].Value.Read<Boolean>());
+            var tList = 
+                    // CLR 4.x
+                    pm.Heap.GetTypeByName("System.Collections.Generic.List<T>")
+                    ?? 
+                    // CLR 2.x
+                    pm.Heap.GetTypeByName("System.Collections.Generic.List`1");
+
+            var screenType = pm.Heap.GetTypeByName("MagicalTimeBean.Bastille.LevelData.MapPosition");
+
+            var screens = state.Value["_orbObtainedPositions"];
+            if (!screens.HasValue) {
+                return null;
+            }
+
+            var screensList = screens.Value.ForceCast(tList);
+            var screensArray = screensList["_items"].Value.ForceCast("System.Object[]");
+
+            return new ArrayPointer(screensArray, screenType, pm.Heap);
+        }
+
+        public int? GetSheepOrbsCollected() {
+            int count = 0;
+            try {
+                var sheepOrbs = GetSheepOrbsArray();
+                if (sheepOrbs.HasValue) {
+                    for (int i = 0, l = sheepOrbs.Value.Count; i < l; i++) {
+                        var orbX = sheepOrbs.Value[i];
+                        var orbY = sheepOrbs.Value[++i];
+
+                        int x = orbX.Value.ForceCast("System.Int32").Read<Int32>();
+                        int y = orbY.Value.ForceCast("System.Int32").Read<Int32>();
+
+                        if (x != 0 && y != 0) {
+                            count++;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                write(e.ToString());
+                return null;
+            }
+
+            return count;
         }
 
         public TimeSpan GetGameTime() {

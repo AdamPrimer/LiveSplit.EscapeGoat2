@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading;
 using Microsoft.Diagnostics.Runtime;
@@ -121,12 +122,21 @@ namespace LiveSplit.EscapeGoat2
                 else
                     address = Value.Type.GetArrayElementAddress(Value.Address, index);
 
-                var elementType = ElementType.Heap.GetObjectType(address);
-                if (elementType != null)
-                    return new ValuePointer(address, elementType, this.Heap);
-                else
-                    return null;
+                //var elementType = ElementType.Heap.GetObjectType(address);
+                //if (elementType != null)
+                    return new ValuePointer(address, ElementType, this.Heap);
+                //else { 
+                //    return null;
+                //}
             }
+        }
+
+        private void write(string str) {
+#if DEBUG
+            StreamWriter wr = new StreamWriter("_goatauto.log", true);
+            wr.WriteLine("[" + DateTime.Now + "] " + str);
+            wr.Close();
+#endif
         }
     }
 }

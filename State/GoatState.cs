@@ -23,8 +23,9 @@ namespace LiveSplit.EscapeGoat2.State
 
         public bool isInGame = false;
         public bool isStarted = false;
-        public bool isDead = false;
-        public bool hasQuit = false;
+
+        public int collectedSheepOrbs = 0;
+        public bool isRoomCounting = false;
 
         public GoatState() {
             map = new WorldMap();
@@ -80,56 +81,45 @@ namespace LiveSplit.EscapeGoat2.State
             }
         }
 
+        public bool HaveEnteredDoor() {
+            bool stopCounting = (bool)goatMemory.GetRoomTimerStopped();
+           
+            if (this.isRoomCounting && stopCounting) {
+                write("Door Entered.");
+                this.isRoomCounting = !stopCounting;
+                return true;
+            } else {
+                this.isRoomCounting = !stopCounting;
+                return false;
+            }
+        }
+
+        public bool HaveCollectedNewSheepOrb() {
+            int numSheepOrbsCollected = (int)goatMemory.GetSheepOrbsCollected();
+
+            if (numSheepOrbsCollected != this.collectedSheepOrbs) {
+                write(string.Format("Sheep Orb Obtained: {0} -> {1}", this.collectedSheepOrbs, numSheepOrbsCollected));
+                this.collectedSheepOrbs = numSheepOrbsCollected;
+                return true;
+            } else {
+                this.collectedSheepOrbs = numSheepOrbsCollected;
+                return false;
+            }
+        }
+
         public void UpdateEndOfLevel() {
             var roomInstance = goatMemory.GetRoomInstance();
             bool isOnAction  = (bool)goatMemory.GetOnActionStage();
 
             if (roomInstance != null && isOnAction) {
                 var room                = roomInstance.Value;
-                bool stopCounting       = (bool)goatMemory.GetRoomTimerStopped();
-                bool hasRunFirstFrame   = (bool)goatMemory.GetRoomHasRunFirstFrame();
-                bool frozen             = (bool)goatMemory.GetRoomFrozen();
-                bool isPaused           = (bool)goatMemory.GetIsGamePaused();
-                bool isQuitting         = (bool)goatMemory.GetIsQuittingGame();
-
-                // Update the players alive state only if control is returned
-                // otherwise when the level is recreated on death the change in
-                // room causes a split.
-                if (!frozen) {
-                    var player  = goatMemory.GetPlayer();
-                    this.isDead = (player == null);
-                }
-
-                // If we're not quitting anymore, and we've regained control
-                // then remove the quit status.
-                if (!isQuitting && !frozen) {
-                    this.hasQuit = false;
-                } 
                 
-                // If we're in the middle of quitting, set quit
-                else if (isQuitting) {
-                    this.hasQuit = true;
-                }
+                bool newDoor      = (bool)HaveEnteredDoor();
+                bool newSheepOrb  = (bool)HaveCollectedNewSheepOrb();
 
-                // Stay out of game until we gain control in the next level
-                bool inGame = true;
-                if ((frozen && this.isInGame == false) || !hasRunFirstFrame) {
-                    inGame = false;
-                }
-
-                if (hasRunFirstFrame && (stopCounting || (frozen && !hasQuit && !isPaused && !isDead))) {
-                    inGame = false;
-                }
-                
-                if (inGame != this.isInGame) {
-                    if (inGame == false) {
-                        write(string.Format("Split Debug: {0} {1} {2} {3} {4} {5} {6}", this.hasQuit, !frozen, isOnAction, isPaused, isDead, stopCounting, hasRunFirstFrame));
-                        int roomID = (int)goatMemory.GetRoomID();
-                        goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
-                    } else {
-                        write(string.Format("Active Debug: {0} {1} {2} {3} {4} {5} {6}", this.hasQuit, !frozen, isOnAction, isPaused, isDead, stopCounting, hasRunFirstFrame));
-                    }
-                    this.isInGame = inGame;
+                if (newDoor || newSheepOrb) {
+                    int roomID = (int)goatMemory.GetRoomID();
+                    goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
                 }
             }
         }
@@ -143,8 +133,6 @@ namespace LiveSplit.EscapeGoat2.State
 
         public void Reset() {
             this.isStarted = false;
-            this.hasQuit = false;
-            this.isDead = false;
             this.isInGame = false;
             this.lastSeen = TimeSpan.Zero;
         }
