@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.Diagnostics.Runtime;
 
-namespace LiveSplit.EscapeGoat2Autosplitter
+namespace LiveSplit.EscapeGoat2
 {
     public struct ValuePointer
     {

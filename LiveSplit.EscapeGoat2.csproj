@@ -6,8 +6,8 @@
     <ProjectGuid>{DF346F9E-4385-4D70-8FC3-8E95370F7A4C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LiveSplit.EscapeGoat2Autosplitter</RootNamespace>
-    <AssemblyName>LiveSplit.EscapeGoat2Autosplitter</AssemblyName>
+    <RootNamespace>LiveSplit.EscapeGoat2</RootNamespace>
+    <AssemblyName>LiveSplit.EscapeGoat2</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>

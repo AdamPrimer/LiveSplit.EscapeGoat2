@@ -8,7 +8,7 @@ using System.Threading;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interop;
 
-namespace LiveSplit.EscapeGoat2Autosplitter.Memory
+namespace LiveSplit.EscapeGoat2.Memory
 {
     public class GoatMemory
     {
@@ -156,7 +156,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
                 var action = GetActionStage();
                 Int64 time = action.Value.Value["<GameState>k__BackingField"].Value["_totalTime"].Value.ForceCast("System.Int64").Read<Int64>();
                 return new TimeSpan(time);
-            } catch (Exception e) {
+            } catch {
                 return TimeSpan.Zero;
             }
         }
@@ -173,9 +173,9 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
             foreach (var field in point.Type.Fields) {
                 string output;
                 if (field.HasSimpleValue)
-                    output = field.GetFieldValue(point.Address).ToString();
+                    output = field.GetValue(point.Address).ToString();
                 else
-                    output = field.GetFieldAddress(point.Address).ToString("X");
+                    output = field.GetAddress(point.Address).ToString("X");
 
                 write(string.Format("  +{0,2:X2} {1} {2} = {3}", field.Offset, field.Type.Name, field.Name, output));
             }

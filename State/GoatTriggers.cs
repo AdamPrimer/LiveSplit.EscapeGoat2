@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using LiveSplit.EscapeGoat2Autosplitter;
-using LiveSplit.EscapeGoat2Autosplitter.Memory;
+using LiveSplit.EscapeGoat2;
+using LiveSplit.EscapeGoat2.Memory;
 
-namespace LiveSplit.EscapeGoat2Autosplitter.State
+namespace LiveSplit.EscapeGoat2.State
 {
     public class SplitEventArgs : EventArgs
     {

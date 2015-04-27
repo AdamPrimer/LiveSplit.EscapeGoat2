@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Diagnostics.Runtime;
 
-namespace LiveSplit.EscapeGoat2Autosplitter
+namespace LiveSplit.EscapeGoat2
 {
     public class StaticField
     {

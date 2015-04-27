@@ -4,9 +4,9 @@
 
 1. Go to the releases page:
 
-    https://github.com/AdamPrimer/LiveSplit.EscapeGoat2Autosplitter/releases
+    https://github.com/AdamPrimer/LiveSplit.EscapeGoat2/releases
 
-2. Download `LiveSplit.EscapeGoat2Autosplitter.dll`
+2. Download `LiveSplit.EscapeGoat2.dll`
 3. Download `Microsoft.Diagnostics.Runtime.dll`
 
 You can optionally download the default LiveSplit splits files: `eg2_any%.lss` or `eg2_100%.lss`.
@@ -14,12 +14,11 @@ You can optionally download the default LiveSplit splits files: `eg2_any%.lss` o
 ## Installing ##
 
 1. Close LiveSplit completely
-2. Place `LiveSplit.EscapeGoat2Autosplitter.dll` and `LiveSplit.EscapeGoat2Autosplitter.dll` in the `Components` directory which is
+2. Place `LiveSplit.EscapeGoat2.dll` and `Microsoft.Diagnostics.Runtime.dll` in the `Components` directory which is
 inside your `LiveSplit` directory.
 3. Open LiveSplit
 4. Open the default splits for the route you want, or your own existing splits.
-5. Right click -> `Edit Layout` -> `+ Icon` -> `Control` -> `Escape Goat 2
-   Autosplitter`
+5. Right click -> `Edit Layout` -> `+ Icon` -> `Control` -> `Escape Goat 2 Autosplitter`
 6. Click `OK` then save your layout.
 
 ## About the Autosplitter ##

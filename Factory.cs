@@ -3,7 +3,7 @@ using LiveSplit.UI.Components;
 using System;
 using LiveSplit.Model;
 
-namespace LiveSplit.EscapeGoat2Autosplitter
+namespace LiveSplit.EscapeGoat2
 {
     public class Factory : IComponentFactory
     {

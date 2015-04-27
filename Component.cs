@@ -5,10 +5,10 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
-using LiveSplit.EscapeGoat2Autosplitter.State;
-using LiveSplit.EscapeGoat2Autosplitter.Memory;
+using LiveSplit.EscapeGoat2.State;
+using LiveSplit.EscapeGoat2.Memory;
 
-namespace LiveSplit.EscapeGoat2Autosplitter
+namespace LiveSplit.EscapeGoat2
 {
     public class EscapeGoat2Component : LogicComponent
     {

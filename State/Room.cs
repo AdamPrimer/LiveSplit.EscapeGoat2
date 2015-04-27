@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LiveSplit.EscapeGoat2Autosplitter.State
+namespace LiveSplit.EscapeGoat2.State
 {
     public class Room
     {
