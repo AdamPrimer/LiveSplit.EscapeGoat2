@@ -2,4 +2,6 @@
 /bin
 /obj
 /*.pdb
-
+/*.un~
+/*.swp
+/*.swo
