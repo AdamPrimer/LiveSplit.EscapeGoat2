@@ -58,10 +58,10 @@ namespace LiveSplit.EscapeGoat2.State
                 UpdateStartOfGame(goatMemory.GetStartOfGame());
             }
 
-            //if (this.isStarted) {
+            if (this.isStarted) {
                 UpdateEndOfLevel();
                 UpdateGameTime();
-            //}
+            }
         }
 
         public void Dispose() {
