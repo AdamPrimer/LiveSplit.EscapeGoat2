@@ -12,6 +12,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
     {
         public event EventHandler OnTimerStarted;
         public event EventHandler OnTimerFinished;
+        public event EventHandler OnTimerChanged;
 
         public bool isOpen = false;
 
@@ -66,11 +67,16 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
 
         public void UpdateGameTime() {
             TimeSpan now = goatMemory.GetGameTime();
+            
             if (now == this.lastSeen) {
-                if (this.OnTimerFinished!= null) this.OnTimerFinished(this, EventArgs.Empty);
+                if (this.OnTimerFinished!= null) this.OnTimerFinished(now, EventArgs.Empty);
             } else if (now > this.lastSeen) {
-                if (this.OnTimerStarted != null) this.OnTimerStarted(this, EventArgs.Empty);
                 this.lastSeen = now;
+                if (this.OnTimerStarted != null) this.OnTimerStarted(now, EventArgs.Empty);
+            }
+
+            if (now >= this.lastSeen) {
+                if (this.OnTimerChanged != null) this.OnTimerChanged(now, EventArgs.Empty);
             }
         }
 
@@ -107,7 +113,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
 
                 // Stay out of game until we gain control in the next level
                 bool inGame = true;
-                if (frozen && (this.isInGame == false || !hasRunFirstFrame)) {
+                if ((frozen && this.isInGame == false) || !hasRunFirstFrame) {
                     inGame = false;
                 }
 

@@ -30,6 +30,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter
             goatState.goatTriggers.OnSplit += OnSplit;
             goatState.OnTimerStarted += goatState_OnLoadStarted;
             goatState.OnTimerFinished += goatState_OnLoadFinished;
+            goatState.OnTimerChanged += goatState_OnIGTChanged;
         }
 
         public override void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode) {
@@ -87,11 +88,15 @@ namespace LiveSplit.EscapeGoat2Autosplitter
         }
 
         void goatState_OnLoadStarted(object sender, EventArgs e) {
-            _state.IsGameTimePaused = false;
+            //_state.IsGameTimePaused = false;
         }
 
         void goatState_OnLoadFinished(object sender, EventArgs e) {
-            _state.IsGameTimePaused = true;
+            //_state.IsGameTimePaused = true;
+        }
+
+        void goatState_OnIGTChanged(object sender, EventArgs e) {
+            _state.SetGameTime((TimeSpan?)sender);
         }
 
         public override Control GetSettingsControl(LayoutMode mode) {
