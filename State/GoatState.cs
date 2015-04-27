@@ -23,6 +23,7 @@ namespace LiveSplit.EscapeGoat2.State
 
         public bool isInGame = false;
         public bool isStarted = false;
+        public int lastRoomID = 0;
 
         public int collectedSheepOrbs = 0;
         public bool isRoomCounting = false;
@@ -84,15 +85,19 @@ namespace LiveSplit.EscapeGoat2.State
         }
 
         public bool HaveEnteredDoor() {
+            int roomID        = (int)goatMemory.GetRoomID();
             bool stopCounting = (bool)goatMemory.GetRoomTimerStopped();
             bool frozen       = (bool)goatMemory.GetRoomFrozen();
             bool firstFrame   = (bool)goatMemory.GetRoomHasRunFirstFrame();
 
             bool timeStopped  = (firstFrame && stopCounting && !frozen);
 
-            if (this.isRoomCounting && timeStopped) {
-                write("Door Entered.");
+            bool isNewRoom    = (roomID != this.lastRoomID);
+
+            if (isNewRoom && this.isRoomCounting && timeStopped) {
+                write(string.Format("Door Entered. {0} -> {0}", this.lastRoomID, roomID));
                 this.isRoomCounting = !timeStopped;
+                this.lastRoomID = roomID;
                 return true;
             } else {
                 this.isRoomCounting = !timeStopped;
@@ -143,6 +148,7 @@ namespace LiveSplit.EscapeGoat2.State
             this.lastSeen = TimeSpan.Zero;
             this.collectedSheepOrbs = 0;
             this.isRoomCounting = false;
+            this.lastRoomID = 0;
         }
 
         private void write(string str) {
