@@ -19,12 +19,17 @@ namespace LiveSplit.EscapeGoat2Autosplitter
         }
 
         public GoatState goatState;
+        private LiveSplitState _state;
 
         protected TimerModel Model { get; set; }
 
-        public EscapeGoat2Component() {
+        public EscapeGoat2Component(LiveSplitState state) {
+            _state = state;
+            
             goatState = new GoatState();
             goatState.goatTriggers.OnSplit += OnSplit;
+            goatState.OnTimerStarted += goatState_OnLoadStarted;
+            goatState.OnTimerFinished += goatState_OnLoadFinished;
         }
 
         public override void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode) {
@@ -79,6 +84,14 @@ namespace LiveSplit.EscapeGoat2Autosplitter
 
         public override void Dispose() {
             goatState.Dispose();
+        }
+
+        void goatState_OnLoadStarted(object sender, EventArgs e) {
+            _state.IsGameTimePaused = false;
+        }
+
+        void goatState_OnLoadFinished(object sender, EventArgs e) {
+            _state.IsGameTimePaused = true;
         }
 
         public override Control GetSettingsControl(LayoutMode mode) {

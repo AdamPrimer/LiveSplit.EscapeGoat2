@@ -10,6 +10,9 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
 {
     public class GoatState
     {
+        public event EventHandler OnTimerStarted;
+        public event EventHandler OnTimerFinished;
+
         public bool isOpen = false;
 
         public WorldMap map;
@@ -70,19 +73,32 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
                 bool frozen             = (bool)goatMemory.GetRoomFrozen();
                 bool isPaused           = (bool)goatMemory.GetIsGamePaused();
                 bool isQuitting         = (bool)goatMemory.GetIsQuittingGame();
-                
+
+                // Update the players alive state only if control is returned
+                // otherwise when the level is recreated on death the change in
+                // room causes a split.
                 if (!frozen) {
                     var player  = goatMemory.GetPlayer();
                     this.isDead = (player == null);
                 }
 
+                // If we're not quitting anymore, and we've regained control
+                // then remove the quit status.
                 if (!isQuitting && !frozen) {
                     this.hasQuit = false;
-                } else if (isQuitting) {
+                } 
+                
+                // If we're in the middle of quitting, set quit
+                else if (isQuitting) {
                     this.hasQuit = true;
                 }
 
+                // Stay out of game until we gain control in the next level
                 bool inGame = true;
+                if (frozen && this.isInGame == false) {
+                    inGame = false;
+                }
+
                 if (hasRunFirstFrame && (stopCounting || (frozen && !hasQuit && !isPaused && !isDead))) {
                     inGame = false;
                 }
@@ -92,6 +108,9 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
                         write(string.Format("Split Debug: {0} {1} {2} {3} {4} {5} {6}", this.hasQuit, !frozen, isOnAction, isPaused, isDead, stopCounting, hasRunFirstFrame));
                         int roomID = (int)goatMemory.GetRoomID();
                         goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
+                        if (this.OnTimerFinished!= null) this.OnTimerFinished(this, EventArgs.Empty);
+                    } else {
+                        if (this.OnTimerStarted != null) this.OnTimerStarted(this, EventArgs.Empty);
                     }
                     this.isInGame = inGame;
                 }

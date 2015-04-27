@@ -20,7 +20,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter
         }
 
         public IComponent Create(LiveSplitState state) {
-            return new EscapeGoat2Component();
+            return new EscapeGoat2Component(state);
         }
 
         public string UpdateName {
