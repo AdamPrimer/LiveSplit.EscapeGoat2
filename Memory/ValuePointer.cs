@@ -38,13 +38,13 @@ namespace LiveSplit.EscapeGoat2Autosplitter
                 ulong address;
 
                 if (field.IsObjectReference()) {
-                    var fieldValue = field.GetFieldValue(Address);
+                    var fieldValue = field.GetValue(Address);
                     if (fieldValue == null)
                         return null;
 
                     address = (ulong)fieldValue;
                 } else {
-                    address = field.GetFieldAddress(Address, false);
+                    address = field.GetAddress(Address, false);
                 }
 
                 if (address == 0)
@@ -58,7 +58,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter
             var field = Type.GetFieldByName(fieldName);
             if (field == null)
                 throw new Exception("No field with this name");
-            return (T)Convert.ChangeType(field.GetFieldValue(Address), typeof(T));
+            return (T)Convert.ChangeType(field.GetValue(Address), typeof(T));
         }
 
         public ValuePointer ForceCast(ClrType newType) {
@@ -81,7 +81,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter
             ulong address = Address;
             // This is required due to a bug in Microsoft.Diagnostics.Runtime
             if (Type.IsPrimitive) {
-                address -= (ulong)((long)this.Heap.PointerSize);
+               address -= (ulong)((long)this.Heap.PointerSize);
             }
             return Type.GetValue(address);
         }

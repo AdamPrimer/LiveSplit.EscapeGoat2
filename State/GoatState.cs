@@ -15,6 +15,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
 
         public bool isOpen = false;
 
+        public TimeSpan lastSeen = TimeSpan.Zero;
         public WorldMap map;
         public GoatMemory goatMemory;
         public GoatTriggers goatTriggers;
@@ -55,11 +56,22 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
 
             if (this.isStarted) {
                 UpdateEndOfLevel();
+                UpdateGameTime();
             }
         }
 
         public void Dispose() {
             goatMemory.Dispose();
+        }
+
+        public void UpdateGameTime() {
+            TimeSpan now = goatMemory.GetGameTime();
+            if (now == this.lastSeen) {
+                if (this.OnTimerFinished!= null) this.OnTimerFinished(this, EventArgs.Empty);
+            } else if (now > this.lastSeen) {
+                if (this.OnTimerStarted != null) this.OnTimerStarted(this, EventArgs.Empty);
+                this.lastSeen = now;
+            }
         }
 
         public void UpdateEndOfLevel() {
@@ -108,9 +120,6 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
                         write(string.Format("Split Debug: {0} {1} {2} {3} {4} {5} {6}", this.hasQuit, !frozen, isOnAction, isPaused, isDead, stopCounting, hasRunFirstFrame));
                         int roomID = (int)goatMemory.GetRoomID();
                         goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
-                        if (this.OnTimerFinished!= null) this.OnTimerFinished(this, EventArgs.Empty);
-                    } else {
-                        if (this.OnTimerStarted != null) this.OnTimerStarted(this, EventArgs.Empty);
                     }
                     this.isInGame = inGame;
                 }
@@ -129,6 +138,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
             this.hasQuit = false;
             this.isDead = false;
             this.isInGame = false;
+            this.lastSeen = TimeSpan.Zero;
         }
 
         private void write(string str) {

@@ -151,6 +151,16 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
                 || action.Value.Value["StageSelectDecorations"].Value["Fader"].Value["Enabled"].Value.Read<Boolean>());
         }
 
+        public TimeSpan GetGameTime() {
+            try {
+                var action = GetActionStage();
+                Int64 time = action.Value.Value["<GameState>k__BackingField"].Value["_totalTime"].Value.ForceCast("System.Int64").Read<Int64>();
+                return new TimeSpan(time);
+            } catch (Exception e) {
+                return TimeSpan.Zero;
+            }
+        }
+
         public bool? GetOnActionStage() {
             StaticField current = GetCurrentScene();
             StaticField action = GetActionStage();
@@ -158,13 +168,20 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
             return (current.Value.Value.Address == action.Value.Value.Address);
         }
 
-        static public void ViewFields(ValuePointer point, string name) {
-            foreach (var ffield in point.Type.Fields) {
-                Console.WriteLine(ffield);
+        public void ViewFields(ValuePointer point) {
+            write(point.Type.Name.ToString());
+            foreach (var field in point.Type.Fields) {
+                string output;
+                if (field.HasSimpleValue)
+                    output = field.GetFieldValue(point.Address).ToString();
+                else
+                    output = field.GetFieldAddress(point.Address).ToString("X");
+
+                write(string.Format("  +{0,2:X2} {1} {2} = {3}", field.Offset, field.Type.Name, field.Name, output));
             }
         }
 
-        static public ValuePointer[] GetObjectsByTypeName(ProcessMangler pm, string name) {
+        public ValuePointer[] GetObjectsByTypeName(ProcessMangler pm, string name) {
             var type = pm.Heap.GetTypeByName(name);
 
             List<ValuePointer> objects = new List<ValuePointer>();

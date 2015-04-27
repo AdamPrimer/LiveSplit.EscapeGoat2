@@ -59,7 +59,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter
 
         public bool IsAccessible {
             get {
-                return Field.GetFieldAddress(Domain) != 0;
+                return Field.GetAddress(Domain) != 0;
             }
         }
 
@@ -67,13 +67,13 @@ namespace LiveSplit.EscapeGoat2Autosplitter
             get {
                 ulong address;
                 if (Field.Type.IsObjectReference) {
-                    var o = Field.GetFieldValue(Domain);
+                    var o = Field.GetValue(Domain);
                     if (o == null)
                         return null;
 
                     address = (ulong)o;
                 } else {
-                    address = Field.GetFieldAddress(Domain);
+                    address = Field.GetAddress(Domain);
                 }
 
                 if (address == 0)
