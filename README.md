@@ -32,7 +32,7 @@ inside your `LiveSplit` directory.
 ## Build Intructions ##
 
 1. Download the source
-2. Open `LiveSplit.EscapeGoat2Autosplitter.sln` in Visual Studio 2013 Community Edition
+2. Open `LiveSplit.EscapeGoat2.sln` in Visual Studio 2013 Community Edition
 3. Expand `References` and delete `LiveSplit.Core` and `UpdateManager`
 4. Right click `References` -> `Add Reference` -> `Browse`
 5. Navigate to your LiveSplit install directory, select `LiveSplit.Core.dll`
