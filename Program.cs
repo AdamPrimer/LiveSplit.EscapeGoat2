@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interop;
+using LiveSplit.EscapeGoat2Autosplitter.State;
 
 namespace LiveSplit.EscapeGoat2Autosplitter
 {
@@ -15,6 +16,8 @@ namespace LiveSplit.EscapeGoat2Autosplitter
         static void Main(string[] args) {
             Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
 
+            WorldMap map = new WorldMap();
+
             using (var pm = AttachToProcess("escapegoat2")) {
                 bool started = false;
                 int roomID = 0;
@@ -22,8 +25,11 @@ namespace LiveSplit.EscapeGoat2Autosplitter
                 bool inGame = false;
                 bool lastInGame = false;
                 bool isDead = false;
+                bool hasQuit = false;
 
                 while (true) {
+                    //var scene = new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "_currentScene");
+
                     var title = new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "<TitleScreenInstance>k__BackingField");
                     bool titleShown = title.Value.Value.GetFieldValue<Boolean>("_titleShown");
                     int titleFadeTimer = title.Value.Value.GetFieldValue<Int32>("_titleTextFadeTimer");
@@ -35,7 +41,10 @@ namespace LiveSplit.EscapeGoat2Autosplitter
 
                     var action = new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "<ActionSceneInstance>k__BackingField");
                     var roomInstance = action.Value.Value["RoomInstance"];
+                    bool quitGameFaderVisible = action.Value.Value["QuitGameFader"].Value["Enabled"].Value.Read<Boolean>();
                     var player = action.Value.Value["_player"];
+
+                    //Console.WriteLine("{0} {1}", scene.Value, action.Value);
 
                     bool pauseMenuVisible = action.Value.Value["PauseMenu"].Value["Visible"].Value.Read<Boolean>();
                     bool pauseMenuFaderVisible = action.Value.Value["StageSelectDecorations"].Value["Fader"].Value["Enabled"].Value.Read<Boolean>();
@@ -51,42 +60,30 @@ namespace LiveSplit.EscapeGoat2Autosplitter
                             isDead                  = (player == null);
                         }
 
-                        if (!stopCounting && hasRunFirstFrame && (!frozen || pauseMenuFaderVisible || pauseMenuVisible || isDead)) {
+                        if (!quitGameFaderVisible && !frozen) {
+                            hasQuit = false;
+                        } else if (quitGameFaderVisible) {
+                            hasQuit = true;
+                        }
+
+                        if (!stopCounting && hasRunFirstFrame && (!frozen || hasQuit || pauseMenuFaderVisible || pauseMenuVisible || isDead)) {
                             inGame = true;
                         } else {
                             inGame = false;
                         }
 
-                        Console.WriteLine("{0} {1} {2} {3} {4} {5} {6}", !frozen, pauseMenuFaderVisible, pauseMenuVisible, isDead, roomID, stopCounting, hasRunFirstFrame);
-                    } else if (isDead) {
-                        inGame = true;
-                    } else {
-                        inGame = false;
-                    }
+                        //Console.WriteLine("{0} {1} {2} {3} {4} {5} {6} {7}", hasQuit, !frozen, pauseMenuFaderVisible, pauseMenuVisible, isDead, roomID, stopCounting, hasRunFirstFrame);
 
-                    if (inGame != lastInGame) {
-                        switch (roomID) {
-                            case 107:
-                            case 108:
-                            case 109:
-                            case 110:
-                            case 115:
-                            case 116:
-                            case 117:
-                            case 113:
-                                break;
-                            default:
-                                if (inGame == false) {
-                                    Console.WriteLine("Room {0}: Done!", roomID);
-                                    break;
-                                } else {
-                                    Console.WriteLine("Room {0}: Start!", roomID);
-                                }
-                                break;
+                        if (inGame != lastInGame) {
+                            if (inGame == false) {
+                                Console.WriteLine("{0}: Done!", map.GetRoom(roomID));
+                            } else if (roomInstance != null) {
+                                Console.WriteLine("{0}: Start!", map.GetRoom(roomID));
+                            }
+
+                            lastInGame = inGame;
+                            lastRoomID = roomID;
                         }
-
-                        lastInGame = inGame;
-                        lastRoomID = roomID;
                     }
 
                     /*

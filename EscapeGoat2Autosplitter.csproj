@@ -66,6 +66,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Memory\StaticField.cs" />
     <Compile Include="Memory\ValuePointer.cs" />
+    <Compile Include="State\Room.cs" />
+    <Compile Include="State\WorldMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
