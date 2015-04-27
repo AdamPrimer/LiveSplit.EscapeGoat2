@@ -18,6 +18,9 @@ You can optionally download the default LiveSplit splits files: `eg2_any%.lss` o
 inside your `LiveSplit` directory.
 3. Open LiveSplit
 4. Open the default splits for the route you want, or your own existing splits.
+5. Right click -> `Edit Layout` -> `+ Icon` -> `Control` -> `Escape Goat 2
+   Autosplitter`
+6. Click `OK` then save your layout.
 
 ## About the Autosplitter ##
 
