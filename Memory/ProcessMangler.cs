@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using Microsoft.Diagnostics.Runtime;
 
 namespace LiveSplit.EscapeGoat2Autosplitter
@@ -18,6 +19,9 @@ namespace LiveSplit.EscapeGoat2Autosplitter
         public ProcessMangler(int processId) {
             DataTarget = DataTarget.AttachToProcess(processId, AttachTimeout, AttachMode);
             var dac = DataTarget.ClrVersions.First().TryGetDacLocation();
+            write(DataTarget.ClrVersions.First().Version.ToString());
+            write(DataTarget.ClrVersions.First().DacInfo.ToString());
+
             if (dac == null)
                 throw new Exception("// Couldn't get DAC location.");
             Runtime = DataTarget.CreateRuntime(dac);
@@ -62,6 +66,14 @@ namespace LiveSplit.EscapeGoat2Autosplitter
 
         public void Dispose() {
             DataTarget.Dispose();
+        }
+
+        private void write(string str) {
+#if DEBUG
+            StreamWriter wr = new StreamWriter("_goatauto.log", true);
+            wr.WriteLine("[" + DateTime.Now + "] " + str);
+            wr.Close();
+#endif
         }
     }
 }

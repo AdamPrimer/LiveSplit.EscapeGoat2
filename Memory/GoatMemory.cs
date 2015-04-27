@@ -16,40 +16,42 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
         public ProcessMangler pm;
 
         public bool isHooked = false;
+        public bool isMangled = false;
         public DateTime hookedTime;
 
         public bool HookProcess() {
-            if (proc == null || proc.HasExited || pm == null) {
+            if (proc == null || proc.HasExited) {
                 Process[] processes = Process.GetProcessesByName("EscapeGoat2");
 
                 if (processes.Length == 0) {
                     this.isHooked = false;
-                    return this.isHooked;
+                    this.isMangled = false;
+                    return this.isHooked && this.isMangled;
                 }
 
                 proc = processes[0];
                 if (proc.HasExited) {
                     this.isHooked = false;
-                    return this.isHooked;
+                    this.isMangled = false;
+                    return this.isHooked && this.isMangled;
                 }
 
-                try {
-                    Thread.Sleep(1000);
-                    pm = new ProcessMangler(proc.Id);
-                } catch (Exception e) {
-                    write("Exception Occured");
-                    write(e.ToString());
-
-                    proc.Dispose();
-                    this.isHooked = false;
-                    return this.isHooked;
-                }
                 this.isHooked = true;
-                
                 hookedTime = DateTime.Now;
             }
 
-            return this.isHooked;
+            if (!this.isMangled && this.isHooked && hookedTime.AddSeconds(2) < DateTime.Now) {
+                try {
+                    pm = new ProcessMangler(proc.Id);
+                    this.isMangled = true;
+                } catch (Exception e) {
+                    write("Exception Occured");
+                    write(e.ToString());
+                    proc.Dispose();
+                }
+            }
+
+            return this.isHooked && this.isMangled;
         }
 
         public void Dispose() {
@@ -94,7 +96,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
                 return started;
             } catch (Exception e) {
                 write(e.ToString());
-                return false;
+                throw e;
             }
         }
 
