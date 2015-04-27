@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interop;
 
@@ -18,7 +19,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
         public DateTime hookedTime;
 
         public bool HookProcess() {
-            if (proc == null || proc.HasExited) {
+            if (proc == null || proc.HasExited || pm == null) {
                 Process[] processes = Process.GetProcessesByName("EscapeGoat2");
 
                 if (processes.Length == 0) {
@@ -33,10 +34,15 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
                 }
 
                 try {
+                    Thread.Sleep(1000);
                     pm = new ProcessMangler(proc.Id);
                 } catch (Exception e) {
                     write("Exception Occured");
                     write(e.ToString());
+
+                    proc.Dispose();
+                    this.isHooked = false;
+                    return this.isHooked;
                 }
                 this.isHooked = true;
                 
@@ -44,6 +50,11 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
             }
 
             return this.isHooked;
+        }
+
+        public void Dispose() {
+            this.pm.Dispose();
+            this.proc.Dispose();
         }
 
         public class CurrentRoom
@@ -70,16 +81,21 @@ namespace LiveSplit.EscapeGoat2Autosplitter.Memory
         }
 
         public bool GetStartOfGame() {
-            var title = new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "<TitleScreenInstance>k__BackingField");
-            bool titleShown = title.Value.Value.GetFieldValue<Boolean>("_titleShown");
-            int titleFadeTimer = title.Value.Value.GetFieldValue<Int32>("_titleTextFadeTimer");
+            try {
+                var title = new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "<TitleScreenInstance>k__BackingField");
+                bool titleShown = title.Value.Value.GetFieldValue<Boolean>("_titleShown");
+                int titleFadeTimer = title.Value.Value.GetFieldValue<Int32>("_titleTextFadeTimer");
 
-            bool started = false;
-            if (titleShown && titleFadeTimer > 0) {
-                started = true;
+                bool started = false;
+                if (titleShown && titleFadeTimer > 0) {
+                    started = true;
+                }
+
+                return started;
+            } catch (Exception e) {
+                write(e.ToString());
+                return false;
             }
-
-            return started;
         }
 
         public ValuePointer? GetRoomInstance() {

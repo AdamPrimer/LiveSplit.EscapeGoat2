@@ -78,6 +78,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter
         }
 
         public override void Dispose() {
+            goatState.Dispose();
         }
 
         public override Control GetSettingsControl(LayoutMode mode) {

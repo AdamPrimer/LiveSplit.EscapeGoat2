@@ -21,7 +21,6 @@ namespace LiveSplit.EscapeGoat2Autosplitter
             if (dac == null)
                 throw new Exception("// Couldn't get DAC location.");
             Runtime = DataTarget.CreateRuntime(dac);
-
             Heap = Runtime.GetHeap();
         }
 

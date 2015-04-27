@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using LiveSplit.EscapeGoat2Autosplitter;
 using LiveSplit.EscapeGoat2Autosplitter.Memory;
 
@@ -27,6 +28,8 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
         public void SplitOnGameStart(bool status) {
             if (OnSplit != null) {
                 OnSplit(this, new SplitEventArgs("Start", status));
+            } else {
+                write("Onsplit is null");
             }
         }
 
@@ -34,6 +37,14 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
             if (OnSplit != null) {
                 OnSplit(this, new SplitEventArgs("End Room", room));
             }
+        }
+
+        private void write(string str) {
+#if DEBUG
+            StreamWriter wr = new StreamWriter("_goatauto.log", true);
+            wr.WriteLine("[" + DateTime.Now + "] " + str);
+            wr.Close();
+#endif
         }
     }
 }

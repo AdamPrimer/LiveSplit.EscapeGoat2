@@ -50,9 +50,13 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
                 UpdateStartOfGame(goatMemory.GetStartOfGame());
             }
 
-            //if (this.isStarted) {
+            if (this.isStarted) {
                 UpdateEndOfLevel();
-            //}
+            }
+        }
+
+        public void Dispose() {
+            goatMemory.Dispose();
         }
 
         public void UpdateEndOfLevel() {
@@ -97,6 +101,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
         public void UpdateStartOfGame(bool isStarted) {
             if (this.isStarted != isStarted) {
                 goatTriggers.SplitOnGameStart(isStarted);
+                this.isStarted = isStarted;
             }
         }
 
