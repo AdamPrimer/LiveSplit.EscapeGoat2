@@ -107,7 +107,7 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
 
                 // Stay out of game until we gain control in the next level
                 bool inGame = true;
-                if (frozen && this.isInGame == false) {
+                if (frozen && (this.isInGame == false || !hasRunFirstFrame)) {
                     inGame = false;
                 }
 
@@ -120,6 +120,8 @@ namespace LiveSplit.EscapeGoat2Autosplitter.State
                         write(string.Format("Split Debug: {0} {1} {2} {3} {4} {5} {6}", this.hasQuit, !frozen, isOnAction, isPaused, isDead, stopCounting, hasRunFirstFrame));
                         int roomID = (int)goatMemory.GetRoomID();
                         goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
+                    } else {
+                        write(string.Format("Active Debug: {0} {1} {2} {3} {4} {5} {6}", this.hasQuit, !frozen, isOnAction, isPaused, isDead, stopCounting, hasRunFirstFrame));
                     }
                     this.isInGame = inGame;
                 }
