@@ -29,6 +29,20 @@ inside your `LiveSplit` directory.
 - Default splits files `eg2_any.lss` and `eg2_100%.lss` are provided to make
   this easier since there are many exits.
 
+## About In-Game Time ##
+
+### To Enable ###
+
+- Right Click -> `Compare Against` -> Game Time
+
+### About ###
+
+- Sets the time to be equal to the in-game timer
+- The In-Game Time is the time seen on the file select menu
+- The In-Game Time is independent from the Level Timer seen in the speedrunners overlay.
+- Splits still occur on exiting doors, even though the In-Game Time continues until unload.
+- Pulls the current In-Game Time right from memory, yes this is as accurate as it gets.
+
 ## Build Intructions ##
 
 1. Download the source
