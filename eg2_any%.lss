@@ -8,7 +8,7 @@
     <RunHistory />
     <Segments>
     <Segment>
-        <Name>Room 1-1</Name>
+        <Name>1-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -17,7 +17,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 1-2</Name>
+        <Name>1-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -26,7 +26,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 1-3</Name>
+        <Name>1-3</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -35,7 +35,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 1-4</Name>
+        <Name>1-4</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -44,7 +44,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 1-5</Name>
+        <Name>1-5</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -53,7 +53,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 1-6</Name>
+        <Name>1-6 Soul</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -62,7 +62,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 1</Name>
+        <Name>1 Left</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -71,7 +71,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 2-1</Name>
+        <Name>2-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -80,7 +80,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 2-2</Name>
+        <Name>2-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -89,7 +89,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 2-3</Name>
+        <Name>2-3</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -98,7 +98,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 2-4</Name>
+        <Name>2-4</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -107,7 +107,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 2-5</Name>
+        <Name>2-5 Soul</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -116,7 +116,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 1</Name>
+        <Name>1 Up</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -125,7 +125,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 2</Name>
+        <Name>2 Right</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -134,7 +134,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 3-1</Name>
+        <Name>3-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -143,7 +143,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 3-2</Name>
+        <Name>3-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -152,7 +152,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 3-3</Name>
+        <Name>3-3</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -161,7 +161,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 3-4</Name>
+        <Name>3-4</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -170,7 +170,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 3-5</Name>
+        <Name>3-5 Soul</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -179,7 +179,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 2</Name>
+        <Name>2 Up</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -188,7 +188,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 3</Name>
+        <Name>3 Left</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -197,7 +197,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 4-1</Name>
+        <Name>4-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -206,7 +206,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 4-2</Name>
+        <Name>4-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -215,7 +215,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 4-3</Name>
+        <Name>4-3</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -224,7 +224,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 4-4</Name>
+        <Name>4-4</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -233,7 +233,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 4-5</Name>
+        <Name>4-5 Soul</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -242,7 +242,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 3</Name>
+        <Name>3 Up</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -251,7 +251,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 4</Name>
+        <Name>4 Right</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -260,7 +260,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 5-1</Name>
+        <Name>5-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -269,7 +269,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 5-2</Name>
+        <Name>5-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -278,7 +278,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 5-3</Name>
+        <Name>5-3</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -287,7 +287,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 5-4</Name>
+        <Name>5-4</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -296,7 +296,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 5-5</Name>
+        <Name>5-5 Soul</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -305,7 +305,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 4</Name>
+        <Name>4 Up</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -314,7 +314,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 5</Name>
+        <Name>5 Left</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -323,7 +323,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 6-1</Name>
+        <Name>6-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -332,7 +332,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 6-2</Name>
+        <Name>6-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -341,7 +341,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 6-3</Name>
+        <Name>6-3</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -350,7 +350,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 6-4</Name>
+        <Name>6-4</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -359,7 +359,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 6-5</Name>
+        <Name>6-5 Soul</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -368,7 +368,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 5</Name>
+        <Name>5 Up</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -377,7 +377,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 6</Name>
+        <Name>6 Up</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -386,7 +386,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 7</Name>
+        <Name>7 Left</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -395,7 +395,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 8-1</Name>
+        <Name>8-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -404,7 +404,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 8-2</Name>
+        <Name>8-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -413,7 +413,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 8-3</Name>
+        <Name>8-3</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -422,7 +422,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 8-4</Name>
+        <Name>8-4</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -431,7 +431,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 8-5</Name>
+        <Name>8-5 Soul</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -440,7 +440,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 7</Name>
+        <Name>7 Up</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -449,7 +449,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 8</Name>
+        <Name>8 Right</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -458,7 +458,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 9-1</Name>
+        <Name>9-1</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -467,7 +467,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 9-2</Name>
+        <Name>9-2</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -476,7 +476,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 9-3</Name>
+        <Name>9-3</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -485,7 +485,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 9-4</Name>
+        <Name>9-4</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -494,7 +494,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 9-5</Name>
+        <Name>9-5</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />
@@ -503,7 +503,7 @@
         <SegmentHistory />
         </Segment>
     <Segment>
-        <Name>Room 9-6</Name>
+        <Name>9-6</Name>
         <Icon />
         <SplitTimes>
             <SplitTime name="Personal Best" />

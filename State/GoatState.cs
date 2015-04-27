@@ -73,12 +73,12 @@ namespace LiveSplit.EscapeGoat2.State
             
             if (now == this.lastSeen) {
                 if (this.OnTimerFinished!= null) this.OnTimerFinished(now, EventArgs.Empty);
-            } else if (now > this.lastSeen) {
+            } else if (now > this.lastSeen && now - this.lastSeen < TimeSpan.FromSeconds(2)) {
                 this.lastSeen = now;
                 if (this.OnTimerStarted != null) this.OnTimerStarted(now, EventArgs.Empty);
             }
 
-            if (now >= this.lastSeen) {
+            if (now >= this.lastSeen && now - this.lastSeen < TimeSpan.FromSeconds(2)) {
                 if (this.OnTimerChanged != null) this.OnTimerChanged(now, EventArgs.Empty);
             }
         }
