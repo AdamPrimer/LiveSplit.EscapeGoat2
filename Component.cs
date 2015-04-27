@@ -88,7 +88,11 @@ namespace LiveSplit.EscapeGoat2
         }
 
         public override void Dispose() {
-            goatState.Dispose();
+            try {
+                goatState.Dispose();
+            } catch (Exception e) {
+                write(e.ToString());
+            }
         }
 
         void goatState_OnLoadStarted(object sender, EventArgs e) {

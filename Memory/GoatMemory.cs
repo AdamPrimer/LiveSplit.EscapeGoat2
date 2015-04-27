@@ -55,8 +55,12 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public void Dispose() {
-            this.pm.Dispose();
-            this.proc.Dispose();
+            if (pm != null) {
+                this.pm.Dispose();
+            }
+            if (proc != null) {
+                this.proc.Dispose();
+            }
         }
 
         public class CurrentRoom
@@ -108,6 +112,22 @@ namespace LiveSplit.EscapeGoat2.Memory
             return null;
         }
 
+        public bool? GetRoomFrozen() {
+            var roomInstance = GetRoomInstance();
+            if (roomInstance != null) {
+                return roomInstance.Value["_frozen"].Value.Read<Boolean>();
+            }
+            return null;
+        }
+
+        public bool? GetRoomHasRunFirstFrame() {
+            var roomInstance = GetRoomInstance();
+            if (roomInstance != null) {
+                return roomInstance.Value["<HasRunFirstFrame>k__BackingField"].Value.Read<Boolean>();
+            }
+            return null;
+        }
+
         public bool? GetRoomTimerStopped() {
             var roomInstance = GetRoomInstance();
             if (roomInstance != null) {
@@ -145,17 +165,22 @@ namespace LiveSplit.EscapeGoat2.Memory
 
         public int? GetSheepOrbsCollected() {
             int count = 0;
+            //write("GetSheepOrbsCollected");
             try {
                 var sheepOrbs = GetSheepOrbsArray();
                 if (sheepOrbs.HasValue) {
-                    for (int i = 0, l = sheepOrbs.Value.Count; i < l; i++) {
+                    //write(sheepOrbs.Value.Count.ToString());
+                    //write(sheepOrbs.Value.Value.Address.ToString("X"));
+                    for (int i = 0, l = sheepOrbs.Value.Count * 2; i < l; i++) {
                         var orbX = sheepOrbs.Value[i];
                         var orbY = sheepOrbs.Value[++i];
+                        //write(orbX.Value.Address.ToString("X"));
+                        //write(orbY.Value.Address.ToString("X"));
 
                         int x = orbX.Value.ForceCast("System.Int32").Read<Int32>();
                         int y = orbY.Value.ForceCast("System.Int32").Read<Int32>();
 
-                        if (x != 0 && y != 0) {
+                        if (x != 0 || y != 0) {
                             count++;
                         }
                     }

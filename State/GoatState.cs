@@ -27,6 +27,8 @@ namespace LiveSplit.EscapeGoat2.State
         public int collectedSheepOrbs = 0;
         public bool isRoomCounting = false;
 
+
+
         public GoatState() {
             map = new WorldMap();
             goatMemory = new GoatMemory();
@@ -56,10 +58,10 @@ namespace LiveSplit.EscapeGoat2.State
                 UpdateStartOfGame(goatMemory.GetStartOfGame());
             }
 
-            if (this.isStarted) {
+            //if (this.isStarted) {
                 UpdateEndOfLevel();
                 UpdateGameTime();
-            }
+            //}
         }
 
         public void Dispose() {
@@ -83,13 +85,17 @@ namespace LiveSplit.EscapeGoat2.State
 
         public bool HaveEnteredDoor() {
             bool stopCounting = (bool)goatMemory.GetRoomTimerStopped();
-           
-            if (this.isRoomCounting && stopCounting) {
+            bool frozen       = (bool)goatMemory.GetRoomFrozen();
+            bool firstFrame   = (bool)goatMemory.GetRoomHasRunFirstFrame();
+
+            bool timeStopped  = (firstFrame && stopCounting && !frozen);
+
+            if (this.isRoomCounting && timeStopped) {
                 write("Door Entered.");
-                this.isRoomCounting = !stopCounting;
+                this.isRoomCounting = !timeStopped;
                 return true;
             } else {
-                this.isRoomCounting = !stopCounting;
+                this.isRoomCounting = !timeStopped;
                 return false;
             }
         }
@@ -135,6 +141,8 @@ namespace LiveSplit.EscapeGoat2.State
             this.isStarted = false;
             this.isInGame = false;
             this.lastSeen = TimeSpan.Zero;
+            this.collectedSheepOrbs = 0;
+            this.isRoomCounting = false;
         }
 
         private void write(string str) {
