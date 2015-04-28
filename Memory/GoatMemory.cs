@@ -22,94 +22,6 @@ namespace LiveSplit.EscapeGoat2.Memory
         public Dictionary<string, StaticField> staticCache = new Dictionary<string, StaticField>();
         public Dictionary<string, ValuePointer> pointerCache = new Dictionary<string, ValuePointer>();
 
-        public void ClearCaches() {
-            pointerCache.Clear();
-            staticCache.Clear();
-        }
-
-        public StaticField GetCachedStaticField(string klass, string fieldName) {
-            string key = string.Format("{0}.{1}", klass, fieldName);
-            if (!staticCache.ContainsKey(key)) {
-                try {
-                    staticCache[key] = new StaticField(pm.Runtime, klass, fieldName);
-                } catch (Exception e) {
-                    write(key);
-                    write(e.ToString());
-                }
-            }
-            return staticCache[key];
-        }
-
-        public ValuePointer? GetCachedValuePointer(StaticField field, string fieldName) {
-            string key = string.Format("{0}.{1}", field.Value.Value.Type.Name, fieldName);
-            if (!pointerCache.ContainsKey(key)) {
-                try {
-                    ValuePointer? vp = field.Value.Value[fieldName];
-                    if (vp == null) {
-                        return null;
-                    }
-                    pointerCache[key] = vp.Value;
-                } catch (Exception e) {
-                    write(key);
-                    write(e.ToString());
-                }
-            }
-            return pointerCache[key];
-        }
-
-        public bool HookProcess() {
-            if (proc == null || proc.HasExited) {
-                Process[] processes = Process.GetProcessesByName("EscapeGoat2");
-
-                if (processes.Length == 0) {
-                    this.isHooked = false;
-                    this.isMangled = false;
-                    return this.isHooked && this.isMangled;
-                }
-
-                proc = processes[0];
-                if (proc.HasExited) {
-                    this.isHooked = false;
-                    this.isMangled = false;
-                    return this.isHooked && this.isMangled;
-                }
-
-                this.isHooked = true;
-                hookedTime = DateTime.Now;
-            }
-
-            if (!this.isMangled && this.isHooked && hookedTime.AddSeconds(2) < DateTime.Now) {
-                try {
-                    pm = new ProcessMangler(proc.Id);
-                    this.isMangled = true;
-                } catch (Exception e) {
-                    write("Exception Occured");
-                    write(e.ToString());
-                    proc.Dispose();
-                }
-            }
-
-            return this.isHooked && this.isMangled;
-        }
-
-        public void Dispose() {
-            if (pm != null) {
-                this.pm.Dispose();
-            }
-            if (proc != null) {
-                this.proc.Dispose();
-            }
-        }
-
-        public class CurrentRoom
-        {
-            public bool active { get; set; }
-            public int id { get; set; }
-            public CurrentRoom(int id, bool active) {
-                this.id = id;
-                this.active = active;
-            }
-        }
 
         public StaticField GetCurrentScene() {
             return GetCachedStaticField("MagicalTimeBean.Bastille.Scenes.SceneManager", "_currentScene");
@@ -125,12 +37,7 @@ namespace LiveSplit.EscapeGoat2.Memory
                 bool titleShown = title.Value.Value.GetFieldValue<Boolean>("_titleShown");
                 int titleFadeTimer = title.Value.Value.GetFieldValue<Int32>("_titleTextFadeTimer");
 
-                bool started = false;
-                if (titleShown && titleFadeTimer > 0) {
-                    started = true;
-                }
-
-                return started;
+                return (titleShown && titleFadeTimer > 0);
             } catch (Exception e) {
                 write(e.ToString());
                 throw e;
@@ -177,9 +84,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         public ArrayPointer? GetSheepOrbsArray() {
             var action = GetActionStage();
             var state = action.Value.Value["<GameState>k__BackingField"];
-            if (!state.HasValue) {
-                return null;
-            }
+            if (!state.HasValue) return null;
 
             var tList = 
                     // CLR 4.x
@@ -191,9 +96,7 @@ namespace LiveSplit.EscapeGoat2.Memory
             var screenType = pm.Heap.GetTypeByName("MagicalTimeBean.Bastille.LevelData.MapPosition");
 
             var screens = state.Value["_orbObtainedPositions"];
-            if (!screens.HasValue) {
-                return null;
-            }
+            if (!screens.HasValue) return null;
 
             var screensList = screens.Value.ForceCast(tList);
             var screensArray = screensList["_items"].Value.ForceCast("System.Object[]");
@@ -215,8 +118,8 @@ namespace LiveSplit.EscapeGoat2.Memory
                         //write(orbX.Value.Address.ToString("X"));
                         //write(orbY.Value.Address.ToString("X"));
 
-                        int x = orbX.Value.ForceCast("System.Int32").Read<Int32>();
-                        int y = orbY.Value.ForceCast("System.Int32").Read<Int32>();
+                        int x = orbX.Value.ForceCast("System.Int32").Read<Int32>(true);
+                        int y = orbY.Value.ForceCast("System.Int32").Read<Int32>(true);
 
                         if (x != 0 || y != 0) {
                             count++;
@@ -274,6 +177,85 @@ namespace LiveSplit.EscapeGoat2.Memory
                 objects.Add(gobj);
             }
             return objects.ToArray();
+        }
+
+        public bool HookProcess() {
+            if (proc == null || proc.HasExited) {
+                Process[] processes = Process.GetProcessesByName("EscapeGoat2");
+
+                if (processes.Length == 0) {
+                    this.isHooked = false;
+                    this.isMangled = false;
+                    return this.isHooked && this.isMangled;
+                }
+
+                proc = processes[0];
+                if (proc.HasExited) {
+                    this.isHooked = false;
+                    this.isMangled = false;
+                    return this.isHooked && this.isMangled;
+                }
+
+                this.isHooked = true;
+                hookedTime = DateTime.Now;
+            }
+
+            if (!this.isMangled && this.isHooked && hookedTime.AddSeconds(2) < DateTime.Now) {
+                try {
+                    pm = new ProcessMangler(proc.Id);
+                    this.isMangled = true;
+                } catch (Exception e) {
+                    write("Exception Occured");
+                    write(e.ToString());
+                    proc.Dispose();
+                }
+            }
+
+            return this.isHooked && this.isMangled;
+        }
+
+        public void Dispose() {
+            if (pm != null) {
+                this.pm.Dispose();
+            }
+            if (proc != null) {
+                this.proc.Dispose();
+            }
+        }
+
+        public StaticField GetCachedStaticField(string klass, string fieldName) {
+            string key = string.Format("{0}.{1}", klass, fieldName);
+            if (!staticCache.ContainsKey(key)) {
+                try {
+                    staticCache[key] = new StaticField(pm.Runtime, klass, fieldName);
+                } catch (Exception e) {
+                    write(key);
+                    write(e.ToString());
+                }
+            }
+            return staticCache[key];
+        }
+
+        public ValuePointer? GetCachedValuePointer(StaticField field, string fieldName) {
+            string key = string.Format("{0}.{1}", field.Value.Value.Type.Name, fieldName);
+            if (!pointerCache.ContainsKey(key)) {
+                try {
+                    ValuePointer? vp = field.Value.Value[fieldName];
+                    if (vp == null) {
+                        return null;
+                    }
+                    pointerCache[key] = vp.Value;
+                } catch (Exception e) {
+                    write(key);
+                    write(e.ToString());
+                }
+            }
+            return pointerCache[key];
+        }
+
+        public void ClearCaches() {
+            pointerCache.Clear();
+            staticCache.Clear();
         }
 
         private void write(string str) {
