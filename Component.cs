@@ -27,7 +27,7 @@ namespace LiveSplit.EscapeGoat2
             _state = state;
             
             goatState = new GoatState();
-            goatState.goatTriggers.OnSplit += OnSplit;
+            goatState.goatTriggers.OnSplit += OnSplitTriggered;
             goatState.OnTimerChanged += goatState_OnIGTChanged;
             goatState.OnTimerFixed += goatState_OnIGTFixed;
             goatState.OnTimerUpdated += goatState_OnIGTUpdated;
@@ -48,8 +48,8 @@ namespace LiveSplit.EscapeGoat2
                 state.OnPause += OnPause;
                 state.OnResume += OnResume;
                 state.OnStart += OnStart;
+                state.OnSplit += OnSplit;
                 state.OnSkipSplit += OnSkipSplit;
-                state.OnSplit += OnLiveSplit;
             }
 
             goatState.Loop();
@@ -62,29 +62,29 @@ namespace LiveSplit.EscapeGoat2
             goatState.goatTriggers.timerRunning = (Model.CurrentState.CurrentPhase == TimerPhase.Running);
         }
 
-        public void OnSplit(object sender, SplitEventArgs e) {
+        public void OnSplitTriggered(object sender, SplitEventArgs e) {
             if (e.name == "Start") {
-                LogWriter.WriteLine("[OriSplitter] Start.");
+                LogWriter.WriteLine("[GoatSplitter] Start.");
                 Model.Start();
                 _state.IsGameTimePaused = true;
             } else {
+                LogWriter.WriteLine("[GoatSplitter] RTA Split {0} of {1}", _state.CurrentSplitIndex + 1, _state.Run.Count);
                 if (!isLastSplit()) {
-                    LogWriter.WriteLine(string.Format("[OriSplitter] Split {0} of {1}", _state.CurrentSplitIndex, _state.Run.Count));
                     Model.Split();
                 } else {
-                    LogWriter.WriteLine("[OriSplitter] Last Split, Pausing Timer.");
+                    LogWriter.WriteLine("[GoatSplitter] RTA Last Split, Pausing Timer.");
                     Model.Pause();
                 }
 
                 Room room = (Room)e.value;
-                LogWriter.WriteLine("{0} Exited.", room);
+                LogWriter.WriteLine("[Room Exit] {0}", room);
             }
         }
 
         void goatState_OnIGTFixed(object sender, EventArgs e) {
             int idx = _state.CurrentSplitIndex;
             if (isLastSplit() && Model.CurrentState.CurrentPhase == TimerPhase.Paused) {
-                LogWriter.WriteLine("[OriSplitter] Last Split, Stopping Timer.");
+                LogWriter.WriteLine("[GoatSplitter] IGT Last Split, Stopping Timer.");
                 Model.Pause();
                 Model.Split();
             }
@@ -106,23 +106,29 @@ namespace LiveSplit.EscapeGoat2
             LogWriter.WriteLine("[LiveSplit] Skip Split.");
         }
 
-        public void OnLiveSplit(object sender, EventArgs e) {
+        public void OnSplit(object sender, EventArgs e) {
             LogWriter.WriteLine("[LiveSplit] Split.");
         }
 
         public void OnResume(object sender, EventArgs e) {
             LogWriter.WriteLine("[LiveSplit] Resume.");
-            goatState.goatTriggers.timerRunning = (Model.CurrentState.CurrentPhase == TimerPhase.Running);
+            goatState.goatTriggers.timerRunning = this.isTimerRunning;
         }
 
         public void OnPause(object sender, EventArgs e) {
             LogWriter.WriteLine("[LiveSplit] Pause.");
-            goatState.goatTriggers.timerRunning = (Model.CurrentState.CurrentPhase == TimerPhase.Running);
+            goatState.goatTriggers.timerRunning = this.isTimerRunning;
         }
 
         public void OnStart(object sender, EventArgs e) {
             LogWriter.WriteLine("[LiveSplit] Start.");
-            goatState.goatTriggers.timerRunning = (Model.CurrentState.CurrentPhase == TimerPhase.Running);
+            goatState.goatTriggers.timerRunning = this.isTimerRunning;
+        }
+
+        public bool isTimerRunning {
+            get {
+                return (Model.CurrentState.CurrentPhase == TimerPhase.Running);
+            }
         }
 
         public override Control GetSettingsControl(LayoutMode mode) {

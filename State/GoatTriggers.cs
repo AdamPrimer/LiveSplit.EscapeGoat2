@@ -15,8 +15,9 @@ namespace LiveSplit.EscapeGoat2.State
 
     public class GoatTriggers
     {
-        public delegate void OnSplitHandler(object sender, SplitEventArgs e);
-        public event OnSplitHandler OnSplit;
+        public event SplitEventHandler OnSplit;
+
+        public delegate void SplitEventHandler(object sender, SplitEventArgs e);
 
         public bool timerRunning = false;
 

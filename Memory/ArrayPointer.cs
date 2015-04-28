@@ -75,10 +75,11 @@ namespace LiveSplit.EscapeGoat2.Memory
                 ulong addr = type.GetArrayElementAddress(Value.Address, i);
 
                 T item = new T();
-
                 foreach (var field in type.ArrayComponentType.Fields) {
+                    if (!field.HasSimpleValue) continue;
+                     
                     for (int j = 0; j < fields.Length; j++) {
-                        if (field.HasSimpleValue && fields[j].Name == field.Name) {
+                        if (fields[j].Name == field.Name) {
                             var val = field.GetValue(addr, true);
                             typeof(T).GetField(field.Name).SetValueDirect(__makeref(item), val);
                         }

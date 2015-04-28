@@ -7,10 +7,6 @@ namespace LiveSplit.EscapeGoat2.State
 {
     public class GoatState
     {
-        public event EventHandler OnTimerFixed;
-        public event EventHandler OnTimerChanged;
-        public event EventHandler OnTimerUpdated;
-
         public bool isOpen = false;
 
         public WorldMap map;
@@ -26,6 +22,10 @@ namespace LiveSplit.EscapeGoat2.State
 
         public TimeSpan lastSeen = TimeSpan.Zero;
 
+        public event EventHandler OnTimerFixed;
+        public event EventHandler OnTimerChanged;
+        public event EventHandler OnTimerUpdated;
+
         public GoatState() {
             map = new WorldMap();
             goatMemory = new GoatMemory();
@@ -34,11 +34,13 @@ namespace LiveSplit.EscapeGoat2.State
 
         public void Reset() {
             this.isStarted = false;
-            this.lastSeen = TimeSpan.Zero;
-            this.collectedSheepOrbs = 0;
             this.isRoomCounting = false;
+
             this.lastRoomID = 0;
             this.wantToSplit = 0;
+            this.collectedSheepOrbs = 0;
+
+            this.lastSeen = TimeSpan.Zero;
         }
 
         public void Dispose() {
@@ -62,7 +64,7 @@ namespace LiveSplit.EscapeGoat2.State
         public void Pulse() {
             try {
                 if (!this.isStarted) {
-                    UpdateStartOfGame(goatMemory.GetStartOfGame());
+                    UpdateStartOfGame();
                 }
 
                 if (this.isStarted) {
@@ -87,7 +89,8 @@ namespace LiveSplit.EscapeGoat2.State
             }
         }
 
-        public void UpdateStartOfGame(bool isStarted) {
+        public void UpdateStartOfGame() {
+            bool isStarted = goatMemory.GetStartOfGame();
             if (this.isStarted != isStarted) {
                 goatTriggers.SplitOnGameStart(isStarted);
                 this.isStarted = isStarted;

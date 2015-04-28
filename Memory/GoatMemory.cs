@@ -125,7 +125,6 @@ namespace LiveSplit.EscapeGoat2.Memory
                     pm = new ProcessMangler(proc.Id);
                     this.isMangled = true;
                 } catch (Exception e) {
-                    LogWriter.WriteLine("Exception Occured");
                     LogWriter.WriteLine(e.ToString());
                     proc.Dispose();
                 }
