@@ -87,33 +87,17 @@ namespace LiveSplit.EscapeGoat2.Memory
             return null;
         }
 
-        public ArrayPointer? GetSheepOrbsArray() {
+        public int? GetSheepOrbsCollected() {
             var action = GetActionStage();
             var state = action.Value.Value["<GameState>k__BackingField"];
             if (!state.HasValue) return null;
 
-            return ReadList(state.Value, "_orbObtainedPositions", "MagicalTimeBean.Bastille.LevelData.MapPosition");
-        }
-
-        public int? GetSheepOrbsCollected() {
-            int count = 0;
-
             try {
-                var sheepOrbs = GetSheepOrbsArray();
-                if (sheepOrbs.HasValue) {
-                    List<MapPosition> orbs = sheepOrbs.Value.Read<MapPosition>();
-                    foreach (MapPosition orb in orbs) {
-                        if (!(orb._x == 0 && orb._y == 0)) {
-                            count++;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                write(e.ToString());
-                return null;
-            }
+                ArrayPointer sheepOrbs = new ArrayPointer(state.Value, "_orbObtainedPositions", "MagicalTimeBean.Bastille.LevelData.MapPosition");
+                return sheepOrbs.Length;
+            } catch (Exception e) { write(e.ToString()); }
 
-            return count;
+            return 0;
         }
 
         public TimeSpan GetGameTime() {
@@ -131,22 +115,6 @@ namespace LiveSplit.EscapeGoat2.Memory
             StaticField action = GetActionStage();
 
             return (current.Value.Value.Address == action.Value.Value.Address);
-        }
-
-        public ArrayPointer? ReadList(ValuePointer state, string fieldName, string fieldType) {
-            var tList =  pm.Heap.GetTypeByName("System.Collections.Generic.List<T>") // CLR 4.x
-                         ?? 
-                         pm.Heap.GetTypeByName("System.Collections.Generic.List`1"); // CLR 2.x
-
-            var listType = pm.Heap.GetTypeByName(fieldType);
-
-            var list = state[fieldName];
-            if (!list.HasValue) return null;
-
-            var listList = list.Value.ForceCast(tList);
-            var listArray = listList["_items"].Value.ForceCast("System.Object[]");
-
-            return new ArrayPointer(listArray, listType, pm.Heap);
         }
 
         public void ViewFields(ValuePointer point) {

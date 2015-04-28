@@ -119,11 +119,43 @@ namespace LiveSplit.EscapeGoat2
         public readonly ValuePointer Value;
         public readonly ClrType ElementType;
         public readonly ClrHeap Heap;
+        public readonly int Length;
+        public readonly bool HasLength;
 
-        public ArrayPointer(ValuePointer value, ClrType elementType, ClrHeap heap) {
+        public ArrayPointer(ValuePointer value, ClrType elementType) {
             Value = value;
             ElementType = elementType;
-            Heap = heap;
+            Heap = elementType.Heap;
+            Length = 0;
+            HasLength = false;
+        }
+
+        public ArrayPointer(ValuePointer value, ClrType elementType, int length) {
+            Value = value;
+            ElementType = elementType;
+            Heap = elementType.Heap;
+            Length = length;
+            HasLength = true;
+        }
+
+        // Initialize from System.Collections.Generic.List
+        public ArrayPointer(ValuePointer state, string fieldName, string fieldType) {
+            var tList =  state.Heap.GetTypeByName("System.Collections.Generic.List<T>") // CLR 4.x
+                         ?? 
+                         state.Heap.GetTypeByName("System.Collections.Generic.List`1"); // CLR 2.x
+
+            var list = state[fieldName];
+            if (!list.HasValue) {
+                throw new Exception(string.Format("Unable to find List<{1}> {0}", fieldType, fieldName));
+            }
+
+            var listList = list.Value.ForceCast(tList);
+
+            Value = listList["_items"].Value.ForceCast("System.Object[]");
+            ElementType = state.Heap.GetTypeByName(fieldType);
+            Heap = state.Heap;
+            Length = listList.GetFieldValue<Int32>("_size");
+            HasLength = true;
         }
 
         public int Count {
