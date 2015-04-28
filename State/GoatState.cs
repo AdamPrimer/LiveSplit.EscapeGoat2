@@ -35,6 +35,10 @@ namespace LiveSplit.EscapeGoat2.State
             goatTriggers = new GoatTriggers();
         }
 
+        public void Dispose() {
+            goatMemory.Dispose();
+        }
+
         public void Loop() {
             bool isNowOpen = (goatMemory.HookProcess() && !goatMemory.proc.HasExited);
 
@@ -68,10 +72,6 @@ namespace LiveSplit.EscapeGoat2.State
             } catch (Exception e) {
                 write(e.ToString());
             }
-        }
-
-        public void Dispose() {
-            goatMemory.Dispose();
         }
 
         public void UpdateGameTime() {
