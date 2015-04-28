@@ -10,6 +10,12 @@ using Microsoft.Diagnostics.Runtime.Interop;
 
 namespace LiveSplit.EscapeGoat2.Memory
 {
+    public struct MapPosition
+    {
+        public int _x;
+        public int _y;
+    }
+
     public class GoatMemory
     {
         public Process proc;
@@ -86,42 +92,18 @@ namespace LiveSplit.EscapeGoat2.Memory
             var state = action.Value.Value["<GameState>k__BackingField"];
             if (!state.HasValue) return null;
 
-            var tList = 
-                    // CLR 4.x
-                    pm.Heap.GetTypeByName("System.Collections.Generic.List<T>")
-                    ?? 
-                    // CLR 2.x
-                    pm.Heap.GetTypeByName("System.Collections.Generic.List`1");
-
-            var screenType = pm.Heap.GetTypeByName("MagicalTimeBean.Bastille.LevelData.MapPosition");
-
-            var screens = state.Value["_orbObtainedPositions"];
-            if (!screens.HasValue) return null;
-
-            var screensList = screens.Value.ForceCast(tList);
-            var screensArray = screensList["_items"].Value.ForceCast("System.Object[]");
-
-            return new ArrayPointer(screensArray, screenType, pm.Heap);
+            return ReadList(state.Value, "_orbObtainedPositions", "MagicalTimeBean.Bastille.LevelData.MapPosition");
         }
 
         public int? GetSheepOrbsCollected() {
             int count = 0;
-            //write("GetSheepOrbsCollected");
+
             try {
                 var sheepOrbs = GetSheepOrbsArray();
                 if (sheepOrbs.HasValue) {
-                    //write(sheepOrbs.Value.Count.ToString());
-                    //write(sheepOrbs.Value.Value.Address.ToString("X"));
-                    for (int i = 0, l = sheepOrbs.Value.Count * 2; i < l; i++) {
-                        var orbX = sheepOrbs.Value[i];
-                        var orbY = sheepOrbs.Value[++i];
-                        //write(orbX.Value.Address.ToString("X"));
-                        //write(orbY.Value.Address.ToString("X"));
-
-                        int x = orbX.Value.ForceCast("System.Int32").Read<Int32>(true);
-                        int y = orbY.Value.ForceCast("System.Int32").Read<Int32>(true);
-
-                        if (x != 0 || y != 0) {
+                    List<MapPosition> orbs = sheepOrbs.Value.Read<MapPosition>();
+                    foreach (MapPosition orb in orbs) {
+                        if (!(orb._x == 0 && orb._y == 0)) {
                             count++;
                         }
                     }
@@ -137,7 +119,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         public TimeSpan GetGameTime() {
             try {
                 var action = GetActionStage();
-                Int64 time = action.Value.Value["<GameState>k__BackingField"].Value["_totalTime"].Value.ForceCast("System.Int64").Read<Int64>(true);
+                Int64 time = action.Value.Value["<GameState>k__BackingField"].Value["_totalTime"].Value.ForceCast("System.Int64").Read<Int64>();
                 return new TimeSpan(time);
             } catch {
                 return TimeSpan.Zero;
@@ -149,6 +131,22 @@ namespace LiveSplit.EscapeGoat2.Memory
             StaticField action = GetActionStage();
 
             return (current.Value.Value.Address == action.Value.Value.Address);
+        }
+
+        public ArrayPointer? ReadList(ValuePointer state, string fieldName, string fieldType) {
+            var tList =  pm.Heap.GetTypeByName("System.Collections.Generic.List<T>") // CLR 4.x
+                         ?? 
+                         pm.Heap.GetTypeByName("System.Collections.Generic.List`1"); // CLR 2.x
+
+            var listType = pm.Heap.GetTypeByName(fieldType);
+
+            var list = state[fieldName];
+            if (!list.HasValue) return null;
+
+            var listList = list.Value.ForceCast(tList);
+            var listArray = listList["_items"].Value.ForceCast("System.Object[]");
+
+            return new ArrayPointer(listArray, listType, pm.Heap);
         }
 
         public void ViewFields(ValuePointer point) {

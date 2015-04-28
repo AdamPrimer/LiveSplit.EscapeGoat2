@@ -67,7 +67,7 @@ namespace LiveSplit.EscapeGoat2.State
 
                 if (this.isStarted) {
                     UpdateEndOfLevel();
-                    UpdateGameTime();     
+                    UpdateGameTime();
                 }
             } catch (Exception e) {
                 write(e.ToString());

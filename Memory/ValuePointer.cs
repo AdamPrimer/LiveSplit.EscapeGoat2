@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Reflection;
 using Microsoft.Diagnostics.Runtime;
 
 namespace LiveSplit.EscapeGoat2
@@ -83,35 +84,17 @@ namespace LiveSplit.EscapeGoat2
         }
 
         public object Read() {
-            return Read(false);
-        }
-
-        public object Read(bool allow_invalid) {
             ulong address = Address;
             // This is required due to a bug in Microsoft.Diagnostics.Runtime
             if (Type.IsPrimitive) {
                address -= (ulong)((long)this.Heap.PointerSize);
             }
 
-            try {
-                ClrType TypeAtAddress = Heap.GetObjectType(address);
-                write(TypeAtAddress.Name);
-            } catch (Exception e) {
-                if (!allow_invalid) {
-                    write(e.ToString());
-                    write(string.Format("Unable To Read {0} ({1})", Type.Name, address.ToString("X")));
-                    return null;
-                }
-            }
             return Type.GetValue(address);
         }
 
         public T Read<T>() {
-            return Read<T>(false);
-        }
-
-        public T Read<T>(bool allow_invalid) {
-            object res = Read(allow_invalid);
+            object res = Read();
             if (res == null) {
                 return default(T);
             }
@@ -147,6 +130,39 @@ namespace LiveSplit.EscapeGoat2
             get {
                 return Value.Type.GetArrayLength(Value.Address);
             }
+        }
+
+        public List<T> Read<T>() where T : new() {
+            ClrType type = Heap.GetObjectType(Value.Address);
+
+            // Only consider types which are arrays that do not have simple values (I.E., are structs).
+            if (!type.IsArray || type.ArrayComponentType.HasSimpleValue) {
+                return null;
+            }
+
+            int len = type.GetArrayLength(Value.Address);
+
+            List<T> list = new List<T>();
+
+            FieldInfo[] fields = typeof(T).GetFields();
+
+            for (int i = 0; i < len; i++) {
+                ulong addr = type.GetArrayElementAddress(Value.Address, i);
+
+                T item = new T();
+
+                foreach (var field in type.ArrayComponentType.Fields) {
+                    for (int j = 0; j < fields.Length; j++) {
+                        if (field.HasSimpleValue && fields[j].Name == field.Name) {
+                            var val = field.GetValue(addr, true);
+                            typeof(T).GetField(field.Name).SetValueDirect(__makeref(item), val);
+                        }
+                    }
+                }
+                list.Add(item);
+            }
+
+            return list;
         }
 
         public ValuePointer? this[int index] {
