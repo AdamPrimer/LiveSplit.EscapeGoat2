@@ -85,8 +85,14 @@ namespace LiveSplit.EscapeGoat2
                 Model.Start();
                 _state.IsGameTimePaused = true;
             } else {
-                write("[OriSplitter] Split.");
-                Model.Split();
+                int idx = _state.CurrentSplitIndex;
+                if (idx != _state.Run.Count - 1) {
+                    write(string.Format("[OriSplitter] Split {0} of {1}", idx, _state.Run.Count));
+                    Model.Split();
+                } else {
+                    write("[OriSplitter] Last Split, Pausing Timer.");
+                    Model.Pause();
+                }
 
                 Room room = (Room)e.value;
                 write(string.Format("{0} Exited.", room.ToString()));
@@ -107,6 +113,12 @@ namespace LiveSplit.EscapeGoat2
 
         void goatState_OnLoadFinished(object sender, EventArgs e) {
             //_state.IsGameTimePaused = true;
+            int idx = _state.CurrentSplitIndex;
+            if (idx == _state.Run.Count - 1 && Model.CurrentState.CurrentPhase == TimerPhase.Paused) {
+                write("[OriSplitter] Last Split, Stopping Timer.");
+                Model.Pause();
+                Model.Split();
+            }
         }
 
         void goatState_OnIGTChanged(object sender, EventArgs e) {
