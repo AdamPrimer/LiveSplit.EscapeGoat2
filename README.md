@@ -33,7 +33,7 @@ inside your `LiveSplit` directory.
 
 ### To Enable ###
 
-- Right Click -> `Compare Against` -> Game Time
+- Right Click -> `Compare Against` -> `Game Time`
 
 ### About ###
 
@@ -42,6 +42,13 @@ inside your `LiveSplit` directory.
 - The In-Game Time is independent from the Level Timer seen in the speedrunners overlay.
 - Splits still occur on exiting doors, even though the In-Game Time continues until unload.
 - Pulls the current In-Game Time right from memory, yes this is as accurate as it gets.
+- RTA time will pause on final exit, IGT continues until end of the fade out. 
+
+## Split Lag ##
+
+There is approximately 0.15s of delay between a split trigger and the split occuring. 
+
+This will be reduced in the future if possible. There is a trade-off between accuracy, CPU performance and the latency in the splits. The current settings have been chosen to maximise accuracy and minimise CPU performance without considerable noticable latency.
 
 ## Build Intructions ##
 
