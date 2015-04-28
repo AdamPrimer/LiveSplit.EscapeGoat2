@@ -41,6 +41,7 @@ namespace LiveSplit.EscapeGoat2
                 state.OnResume += OnResume;
                 state.OnStart += OnStart;
                 state.OnSkipSplit += OnSkipSplit;
+                state.OnSplit += OnLiveSplit;
             }
 
             goatState.Loop();
@@ -49,6 +50,11 @@ namespace LiveSplit.EscapeGoat2
 
         public void OnSkipSplit(object sender, EventArgs e) {
             write("[LiveSplit] Skip Split.");
+            //goatState.goatTriggers.GoToNextSplit();
+        }
+
+        public void OnLiveSplit(object sender, EventArgs e) {
+            write("[LiveSplit] Split.");
             //goatState.goatTriggers.GoToNextSplit();
         }
 

@@ -19,6 +19,44 @@ namespace LiveSplit.EscapeGoat2.Memory
         public bool isMangled = false;
         public DateTime hookedTime;
 
+        public Dictionary<string, StaticField> staticCache = new Dictionary<string, StaticField>();
+        public Dictionary<string, ValuePointer> pointerCache = new Dictionary<string, ValuePointer>();
+
+        public void ClearCaches() {
+            pointerCache.Clear();
+            staticCache.Clear();
+        }
+
+        public StaticField GetCachedStaticField(string klass, string fieldName) {
+            string key = string.Format("{0}.{1}", klass, fieldName);
+            if (!staticCache.ContainsKey(key)) {
+                try {
+                    staticCache[key] = new StaticField(pm.Runtime, klass, fieldName);
+                } catch (Exception e) {
+                    write(key);
+                    write(e.ToString());
+                }
+            }
+            return staticCache[key];
+        }
+
+        public ValuePointer? GetCachedValuePointer(StaticField field, string fieldName) {
+            string key = string.Format("{0}.{1}", field.Value.Value.Type.Name, fieldName);
+            if (!pointerCache.ContainsKey(key)) {
+                try {
+                    ValuePointer? vp = field.Value.Value[fieldName];
+                    if (vp == null) {
+                        return null;
+                    }
+                    pointerCache[key] = vp.Value;
+                } catch (Exception e) {
+                    write(key);
+                    write(e.ToString());
+                }
+            }
+            return pointerCache[key];
+        }
+
         public bool HookProcess() {
             if (proc == null || proc.HasExited) {
                 Process[] processes = Process.GetProcessesByName("EscapeGoat2");
@@ -74,16 +112,16 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public StaticField GetCurrentScene() {
-            return new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "_currentScene");
+            return GetCachedStaticField("MagicalTimeBean.Bastille.Scenes.SceneManager", "_currentScene");
         }
 
         public StaticField GetActionStage() {
-            return new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "<ActionSceneInstance>k__BackingField");
+            return GetCachedStaticField("MagicalTimeBean.Bastille.Scenes.SceneManager", "<ActionSceneInstance>k__BackingField");
         }
 
         public bool GetStartOfGame() {
             try {
-                var title = new StaticField(pm.Runtime, "MagicalTimeBean.Bastille.Scenes.SceneManager", "<TitleScreenInstance>k__BackingField");
+                var title = GetCachedStaticField("MagicalTimeBean.Bastille.Scenes.SceneManager", "<TitleScreenInstance>k__BackingField");
                 bool titleShown = title.Value.Value.GetFieldValue<Boolean>("_titleShown");
                 int titleFadeTimer = title.Value.Value.GetFieldValue<Int32>("_titleTextFadeTimer");
 
@@ -101,13 +139,13 @@ namespace LiveSplit.EscapeGoat2.Memory
 
         public ValuePointer? GetRoomInstance() {
             var action = GetActionStage();
-            return action.Value.Value["RoomInstance"];
+            return GetCachedValuePointer(action, "RoomInstance");
         }
 
         public int? GetRoomID() {
             var roomInstance = GetRoomInstance();
             if (roomInstance != null) {
-                return roomInstance.Value["<RoomID>k__BackingField"].Value.Read<Int32>();
+                return roomInstance.Value.GetFieldValue<Int32>("<RoomID>k__BackingField");
             }
             return null;
         }
@@ -115,7 +153,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         public bool? GetRoomFrozen() {
             var roomInstance = GetRoomInstance();
             if (roomInstance != null) {
-                return roomInstance.Value["_frozen"].Value.Read<Boolean>();
+                return roomInstance.Value.GetFieldValue<Boolean>("_frozen");
             }
             return null;
         }
@@ -123,7 +161,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         public bool? GetRoomHasRunFirstFrame() {
             var roomInstance = GetRoomInstance();
             if (roomInstance != null) {
-                return roomInstance.Value["<HasRunFirstFrame>k__BackingField"].Value.Read<Boolean>();
+                return roomInstance.Value.GetFieldValue<Boolean>("<HasRunFirstFrame>k__BackingField");
             }
             return null;
         }
@@ -131,7 +169,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         public bool? GetRoomTimerStopped() {
             var roomInstance = GetRoomInstance();
             if (roomInstance != null) {
-                return roomInstance.Value["<StopCountingElapsedTime>k__BackingField"].Value.Read<Boolean>();
+                return roomInstance.Value.GetFieldValue<Boolean>("<StopCountingElapsedTime>k__BackingField");
             }
             return null;
         }
@@ -196,7 +234,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         public TimeSpan GetGameTime() {
             try {
                 var action = GetActionStage();
-                Int64 time = action.Value.Value["<GameState>k__BackingField"].Value["_totalTime"].Value.ForceCast("System.Int64").Read<Int64>();
+                Int64 time = action.Value.Value["<GameState>k__BackingField"].Value["_totalTime"].Value.ForceCast("System.Int64").Read<Int64>(true);
                 return new TimeSpan(time);
             } catch {
                 return TimeSpan.Zero;

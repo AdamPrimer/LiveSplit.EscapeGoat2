@@ -62,6 +62,10 @@ namespace LiveSplit.EscapeGoat2
             return (T)Convert.ChangeType(field.GetValue(Address), typeof(T));
         }
 
+        public T GetDeepFieldValue<T>(string[] fieldNames) {
+            return (T)Convert.ChangeType(Type.GetFieldValue(Address, fieldNames), typeof(T));
+        }
+
         public ValuePointer ForceCast(ClrType newType) {
             return new ValuePointer(Address, newType, this.Heap);
         }
@@ -79,20 +83,51 @@ namespace LiveSplit.EscapeGoat2
         }
 
         public object Read() {
+            return Read(false);
+        }
+
+        public object Read(bool allow_invalid) {
             ulong address = Address;
             // This is required due to a bug in Microsoft.Diagnostics.Runtime
             if (Type.IsPrimitive) {
                address -= (ulong)((long)this.Heap.PointerSize);
             }
+
+            try {
+                ClrType TypeAtAddress = Heap.GetObjectType(address);
+                write(TypeAtAddress.Name);
+            } catch (Exception e) {
+                if (!allow_invalid) {
+                    write(e.ToString());
+                    write(string.Format("Unable To Read {0} ({1})", Type.Name, address.ToString("X")));
+                    return null;
+                }
+            }
             return Type.GetValue(address);
         }
 
         public T Read<T>() {
-            return (T)Convert.ChangeType(Read(), typeof(T));
+            return Read<T>(false);
+        }
+
+        public T Read<T>(bool allow_invalid) {
+            object res = Read(allow_invalid);
+            if (res == null) {
+                return default(T);
+            }
+            return (T)Convert.ChangeType(res, typeof(T));
         }
 
         public override string ToString() {
             return String.Format("<{0:X8} {1}>", Address, Type.Name);
+        }
+
+        private void write(string str) {
+#if DEBUG
+            StreamWriter wr = new StreamWriter("_goatauto.log", true);
+            wr.WriteLine("[" + DateTime.Now + "] " + str);
+            wr.Close();
+#endif
         }
     }
 

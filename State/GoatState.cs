@@ -51,16 +51,22 @@ namespace LiveSplit.EscapeGoat2.State
             if (isOpen) {
                 Pulse();
             }
+
+            goatMemory.ClearCaches();
         }
 
         public void Pulse() {
-            if (!this.isStarted) {
-                UpdateStartOfGame(goatMemory.GetStartOfGame());
-            }
+            try {
+                if (!this.isStarted) {
+                    UpdateStartOfGame(goatMemory.GetStartOfGame());
+                }
 
-            if (this.isStarted) {
-                UpdateEndOfLevel();
-                UpdateGameTime();
+                if (this.isStarted) {
+                    UpdateEndOfLevel();
+                    UpdateGameTime();     
+                }
+            } catch (Exception e) {
+                write(e.ToString());
             }
         }
 
@@ -93,7 +99,7 @@ namespace LiveSplit.EscapeGoat2.State
 
             if (isNewRoom && this.isRoomCounting && timeStopped) {
                 this.wantToSplit++;
-                if (this.wantToSplit > 10) {
+                if (this.wantToSplit > 2) {
                     write(string.Format("Door Entered. {0} -> {1} {2}", this.lastRoomID, roomID, this.wantToSplit));
 
                     this.wantToSplit = 0;
