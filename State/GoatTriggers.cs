@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using LiveSplit.EscapeGoat2;
-using LiveSplit.EscapeGoat2.Memory;
+using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.State
 {
@@ -29,7 +24,7 @@ namespace LiveSplit.EscapeGoat2.State
             if (OnSplit != null) {
                 OnSplit(this, new SplitEventArgs("Start", status));
             } else {
-                write("Onsplit is null");
+                LogWriter.WriteLine("Onsplit is null");
             }
         }
 
@@ -37,14 +32,6 @@ namespace LiveSplit.EscapeGoat2.State
             if (OnSplit != null) {
                 OnSplit(this, new SplitEventArgs("End Room", room));
             }
-        }
-
-        private void write(string str) {
-#if DEBUG
-            StreamWriter wr = new StreamWriter("_goatauto.log", true);
-            wr.WriteLine("[" + DateTime.Now + "] " + str);
-            wr.Close();
-#endif
         }
     }
 }

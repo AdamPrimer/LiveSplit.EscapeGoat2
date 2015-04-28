@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.State
 {
+    public struct MapPosition
+    {
+        public int _x;
+        public int _y;
+    }
+
     public class WorldMap
     {
         private Dictionary<int, Room> _rooms = new Dictionary<int, Room>();

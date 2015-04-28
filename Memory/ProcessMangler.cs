@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.IO;
 using Microsoft.Diagnostics.Runtime;
+using LiveSplit.EscapeGoat2.Debugging;
 
-namespace LiveSplit.EscapeGoat2
+namespace LiveSplit.EscapeGoat2.Memory
 {
     public class ProcessMangler : IDisposable
     {
@@ -19,9 +18,6 @@ namespace LiveSplit.EscapeGoat2
         public ProcessMangler(int processId) {
             DataTarget = DataTarget.AttachToProcess(processId, AttachTimeout, AttachMode);
             var dac = DataTarget.ClrVersions.First().TryGetDacLocation();
-            write(DataTarget.ClrVersions.First().Version.ToString());
-            write(DataTarget.ClrVersions.First().DacInfo.ToString());
-
             if (dac == null)
                 throw new Exception("// Couldn't get DAC location.");
             Runtime = DataTarget.CreateRuntime(dac);
@@ -66,14 +62,6 @@ namespace LiveSplit.EscapeGoat2
 
         public void Dispose() {
             DataTarget.Dispose();
-        }
-
-        private void write(string str) {
-#if DEBUG
-            StreamWriter wr = new StreamWriter("_goatauto.log", true);
-            wr.WriteLine("[" + DateTime.Now + "] " + str);
-            wr.Close();
-#endif
         }
     }
 }

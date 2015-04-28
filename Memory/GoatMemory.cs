@@ -1,21 +1,10 @@
 ﻿using System;
-using System.Text;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using Microsoft.Diagnostics.Runtime;
-using Microsoft.Diagnostics.Runtime.Interop;
+using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.Memory
 {
-    public struct MapPosition
-    {
-        public int _x;
-        public int _y;
-    }
-
     public class GoatMemory
     {
         public Process proc;
@@ -27,7 +16,6 @@ namespace LiveSplit.EscapeGoat2.Memory
 
         public Dictionary<string, StaticField> staticCache = new Dictionary<string, StaticField>();
         public Dictionary<string, ValuePointer> pointerCache = new Dictionary<string, ValuePointer>();
-
 
         public StaticField GetCurrentScene() {
             return GetCachedStaticField("MagicalTimeBean.Bastille.Scenes.SceneManager", "_currentScene");
@@ -45,7 +33,7 @@ namespace LiveSplit.EscapeGoat2.Memory
 
                 return (titleShown && titleFadeTimer > 0);
             } catch (Exception e) {
-                write(e.ToString());
+                LogWriter.WriteLine(e.ToString());
                 throw e;
             }
         }
@@ -65,26 +53,20 @@ namespace LiveSplit.EscapeGoat2.Memory
 
         public bool? GetRoomFrozen() {
             var roomInstance = GetRoomInstance();
-            if (roomInstance != null) {
-                return roomInstance.Value.GetFieldValue<Boolean>("_frozen");
-            }
-            return null;
+            if (roomInstance == null) return null;
+            return roomInstance.Value.GetFieldValue<Boolean>("_frozen");
         }
 
         public bool? GetRoomHasRunFirstFrame() {
             var roomInstance = GetRoomInstance();
-            if (roomInstance != null) {
-                return roomInstance.Value.GetFieldValue<Boolean>("<HasRunFirstFrame>k__BackingField");
-            }
-            return null;
+            if (roomInstance == null) return null;
+            return roomInstance.Value.GetFieldValue<Boolean>("<HasRunFirstFrame>k__BackingField");
         }
 
         public bool? GetRoomTimerStopped() {
             var roomInstance = GetRoomInstance();
-            if (roomInstance != null) {
-                return roomInstance.Value.GetFieldValue<Boolean>("<StopCountingElapsedTime>k__BackingField");
-            }
-            return null;
+            if (roomInstance == null) return null;
+            return roomInstance.Value.GetFieldValue<Boolean>("<StopCountingElapsedTime>k__BackingField");
         }
 
         public int? GetSheepOrbsCollected() {
@@ -95,7 +77,7 @@ namespace LiveSplit.EscapeGoat2.Memory
             try {
                 ArrayPointer sheepOrbs = new ArrayPointer(state.Value, "_orbObtainedPositions", "MagicalTimeBean.Bastille.LevelData.MapPosition");
                 return sheepOrbs.Length;
-            } catch (Exception e) { write(e.ToString()); }
+            } catch (Exception e) { LogWriter.WriteLine(e.ToString()); }
 
             return 0;
         }
@@ -115,34 +97,6 @@ namespace LiveSplit.EscapeGoat2.Memory
             StaticField action = GetActionStage();
 
             return (current.Value.Value.Address == action.Value.Value.Address);
-        }
-
-        public void ViewFields(ValuePointer point) {
-            write(point.Type.Name.ToString());
-            foreach (var field in point.Type.Fields) {
-                string output;
-                if (field.HasSimpleValue)
-                    output = field.GetValue(point.Address).ToString();
-                else
-                    output = field.GetAddress(point.Address).ToString("X");
-
-                write(string.Format("  +{0,2:X2} {1} {2} = {3}", field.Offset, field.Type.Name, field.Name, output));
-            }
-        }
-
-        public ValuePointer[] GetObjectsByTypeName(ProcessMangler pm, string name) {
-            var type = pm.Heap.GetTypeByName(name);
-
-            List<ValuePointer> objects = new List<ValuePointer>();
-            foreach (ulong obj in pm.Heap.EnumerateObjects()) {
-                ClrType objtype = pm.Heap.GetObjectType(obj);
-                if (objtype == null || objtype != type)
-                    continue;
-
-                ValuePointer gobj = new ValuePointer(obj, type, pm.Heap);
-                objects.Add(gobj);
-            }
-            return objects.ToArray();
         }
 
         public bool HookProcess() {
@@ -171,8 +125,8 @@ namespace LiveSplit.EscapeGoat2.Memory
                     pm = new ProcessMangler(proc.Id);
                     this.isMangled = true;
                 } catch (Exception e) {
-                    write("Exception Occured");
-                    write(e.ToString());
+                    LogWriter.WriteLine("Exception Occured");
+                    LogWriter.WriteLine(e.ToString());
                     proc.Dispose();
                 }
             }
@@ -181,12 +135,8 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public void Dispose() {
-            if (pm != null) {
-                this.pm.Dispose();
-            }
-            if (proc != null) {
-                this.proc.Dispose();
-            }
+            if (pm != null)   this.pm.Dispose();
+            if (proc != null) this.proc.Dispose();
         }
 
         public StaticField GetCachedStaticField(string klass, string fieldName) {
@@ -195,8 +145,8 @@ namespace LiveSplit.EscapeGoat2.Memory
                 try {
                     staticCache[key] = new StaticField(pm.Runtime, klass, fieldName);
                 } catch (Exception e) {
-                    write(key);
-                    write(e.ToString());
+                    LogWriter.WriteLine(key);
+                    LogWriter.WriteLine(e.ToString());
                 }
             }
             return staticCache[key];
@@ -212,8 +162,8 @@ namespace LiveSplit.EscapeGoat2.Memory
                     }
                     pointerCache[key] = vp.Value;
                 } catch (Exception e) {
-                    write(key);
-                    write(e.ToString());
+                    LogWriter.WriteLine(key);
+                    LogWriter.WriteLine(e.ToString());
                 }
             }
             return pointerCache[key];
@@ -222,14 +172,6 @@ namespace LiveSplit.EscapeGoat2.Memory
         public void ClearCaches() {
             pointerCache.Clear();
             staticCache.Clear();
-        }
-
-        private void write(string str) {
-#if DEBUG
-            StreamWriter wr = new StreamWriter("_goatauto.log", true);
-            wr.WriteLine("[" + DateTime.Now + "] " + str);
-            wr.Close();
-#endif
         }
     }
 }

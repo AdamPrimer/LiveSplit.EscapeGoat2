@@ -1,6 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
 using LiveSplit.UI.Components;
-using System;
 using LiveSplit.Model;
 
 namespace LiveSplit.EscapeGoat2
