@@ -85,8 +85,9 @@ namespace LiveSplit.EscapeGoat2.State
                 bool newSheepOrb  = (bool)HaveCollectedNewSheepOrb();
                 bool newShard     = (bool)HaveCollectedNewShard();
 
+                int roomID = (int)goatMemory.GetRoomID();
+                //LogWriter.WriteLine("{0} {1} {2} {3}", roomID, newDoor, newSheepOrb, newShard);
                 if (newDoor || newSheepOrb || newShard) {
-                    int roomID = (int)goatMemory.GetRoomID();
                     goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
                 }
             }
@@ -123,10 +124,12 @@ namespace LiveSplit.EscapeGoat2.State
             bool timeStopped  = (firstFrame && stopCounting && !frozen);
             bool isNewRoom    = (roomID != this.lastRoomID);
 
+            //LogWriter.WriteLine("{0} {1} {2} {3} {4}", roomID, stopCounting, !frozen, firstFrame, isNewRoom);
+
             if (isNewRoom && this.isRoomCounting && timeStopped) {
                 this.wantToSplit++;
                 if (this.wantToSplit > 1) {
-                    LogWriter.WriteLine("Door Entered. {0} -> {1} {2}", this.lastRoomID, roomID, this.wantToSplit);
+                    LogWriter.WriteLine("Door Entered ({0} -> {1}) {2}", this.lastRoomID, roomID, this.wantToSplit);
 
                     this.wantToSplit = 0;
                     this.isRoomCounting = !timeStopped;
@@ -146,7 +149,9 @@ namespace LiveSplit.EscapeGoat2.State
             int numSheepOrbsCollected = (int)goatMemory.GetSheepOrbsCollected();
 
             if (numSheepOrbsCollected > curSheepOrbsCollected) {
-                LogWriter.WriteLine("Sheep Orb Obtained: {0} -> {1}", this.collectedSheepOrbs, numSheepOrbsCollected);
+                int roomID = (int)goatMemory.GetRoomID();
+                LogWriter.WriteLine("Sheep Orb Obtained: {0} -> {1} ({2} -> {3})", this.collectedSheepOrbs, numSheepOrbsCollected, this.lastRoomID, roomID);
+                this.lastRoomID = roomID;
             }
 
             this.collectedSheepOrbs = numSheepOrbsCollected;
@@ -158,7 +163,9 @@ namespace LiveSplit.EscapeGoat2.State
             int numShardsCollected = (int)goatMemory.GetShardsCollected();
 
             if (numShardsCollected > curShardsCollected) {
-                LogWriter.WriteLine("Shard Obtained: {0} -> {1}", this.collectedShards, numShardsCollected);
+                int roomID = (int)goatMemory.GetRoomID();
+                LogWriter.WriteLine("Shard Obtained: {0} -> {1} ({2} -> {3})", this.collectedShards, numShardsCollected, this.lastRoomID, roomID);
+                this.lastRoomID = roomID;
             }
 
             this.collectedShards = numShardsCollected;
