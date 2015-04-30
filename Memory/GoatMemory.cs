@@ -71,7 +71,7 @@ namespace LiveSplit.EscapeGoat2.Memory
 
         public int? GetSheepOrbsCollected() {
             var action = GetActionStage();
-            var state = action.Value.Value["<GameState>k__BackingField"];
+            var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
             if (!state.HasValue) return null;
 
             try {
@@ -82,10 +82,24 @@ namespace LiveSplit.EscapeGoat2.Memory
             return 0;
         }
 
+        public int? GetShardsCollected() {
+            var action = GetActionStage();
+            var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
+            if (!state.HasValue) return null;
+
+            try {
+                ArrayPointer secretRooms = new ArrayPointer(state.Value, "_secretRoomsBeaten", "MagicalTimeBean.Bastille.LevelData.MapPosition");
+                return secretRooms.Length;
+            } catch (Exception e) { LogWriter.WriteLine(e.ToString()); }
+
+            return 0;
+        }
+
         public TimeSpan GetGameTime() {
             try {
                 var action = GetActionStage();
-                Int64 time = action.Value.Value["<GameState>k__BackingField"].Value["_totalTime"].Value.ForceCast("System.Int64").Read<Int64>();
+                var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
+                Int64 time = state.Value["_totalTime"].Value.ForceCast("System.Int64").Read<Int64>();
                 return new TimeSpan(time);
             } catch {
                 return TimeSpan.Zero;

@@ -18,6 +18,7 @@ namespace LiveSplit.EscapeGoat2.State
 
         public int lastRoomID = 0;
         public int wantToSplit = 0;
+        public int collectedShards = 0;
         public int collectedSheepOrbs = 0;
 
         public TimeSpan lastSeen = TimeSpan.Zero;
@@ -38,6 +39,7 @@ namespace LiveSplit.EscapeGoat2.State
 
             this.lastRoomID = 0;
             this.wantToSplit = 0;
+            this.collectedShards = 0;
             this.collectedSheepOrbs = 0;
 
             this.lastSeen = TimeSpan.Zero;
@@ -81,8 +83,9 @@ namespace LiveSplit.EscapeGoat2.State
             if (roomInstance != null && isOnAction) {
                 bool newDoor      = (bool)HaveEnteredDoor();
                 bool newSheepOrb  = (bool)HaveCollectedNewSheepOrb();
+                bool newShard     = (bool)HaveCollectedNewShard();
 
-                if (newDoor || newSheepOrb) {
+                if (newDoor || newSheepOrb || newShard) {
                     int roomID = (int)goatMemory.GetRoomID();
                     goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
                 }
@@ -148,6 +151,18 @@ namespace LiveSplit.EscapeGoat2.State
 
             this.collectedSheepOrbs = numSheepOrbsCollected;
             return (numSheepOrbsCollected > curSheepOrbsCollected);
+        }
+
+        public bool HaveCollectedNewShard() {
+            int curShardsCollected = this.collectedShards;
+            int numShardsCollected = (int)goatMemory.GetShardsCollected();
+
+            if (numShardsCollected > curShardsCollected) {
+                LogWriter.WriteLine("Shard Obtained: {0} -> {1}", this.collectedShards, numShardsCollected);
+            }
+
+            this.collectedShards = numShardsCollected;
+            return (numShardsCollected > curShardsCollected);
         }
     }
 }
