@@ -125,7 +125,7 @@ namespace LiveSplit.EscapeGoat2.State
 
             if (isNewRoom && this.isRoomCounting && timeStopped) {
                 this.wantToSplit++;
-                if (this.wantToSplit > 2) {
+                if (this.wantToSplit > 1) {
                     LogWriter.WriteLine("Door Entered. {0} -> {1} {2}", this.lastRoomID, roomID, this.wantToSplit);
 
                     this.wantToSplit = 0;
