@@ -50,10 +50,16 @@ namespace LiveSplit.EscapeGoat2
                 state.OnStart += OnStart;
                 state.OnSplit += OnSplit;
                 state.OnSkipSplit += OnSkipSplit;
+                state.OnUndoSplit += OnUndoSplit;
             }
 
             goatState.Loop();
             goatState.goatTriggers.timerRunning = (Model.CurrentState.CurrentPhase == TimerPhase.Running);
+        }
+
+        public void OnUndoSplit(object sender, EventArgs e) {
+            LogWriter.WriteLine("[LiveSplit] Undo Split.");
+            goatState.lastRoomID = 0;
         }
 
         public void OnReset(object sender, TimerPhase e) {
