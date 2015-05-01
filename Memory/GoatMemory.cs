@@ -46,7 +46,7 @@ namespace LiveSplit.EscapeGoat2.Memory
 
         public int? GetRoomID() {
             var roomInstance = GetRoomInstance();
-            if (roomInstance != null) {
+            if (roomInstance.HasValue) {
                 return roomInstance.Value.GetFieldValue<Int32>("<RoomID>k__BackingField");
             }
             return null;
