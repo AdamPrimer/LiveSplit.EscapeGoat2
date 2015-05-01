@@ -46,7 +46,7 @@ inside your `LiveSplit` directory.
 
 ## Split Lag ##
 
-There is approximately 0.15s of delay between a split trigger and the split occuring. 
+There is approximately 0.07s of delay between a split trigger and the split occuring. 
 
 This will be reduced in the future if possible. There is a trade-off between accuracy, CPU performance and the latency in the splits. The current settings have been chosen to maximise accuracy and minimise CPU performance without considerable noticable latency.
 
