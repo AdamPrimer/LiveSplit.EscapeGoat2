@@ -5,6 +5,12 @@ using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.State
 {
+    public enum DoorState
+    {
+        Clear,
+        Entering
+    }
+
     public class GoatState
     {
         public bool isOpen = false;
@@ -15,6 +21,7 @@ namespace LiveSplit.EscapeGoat2.State
 
         public bool isStarted = false;
         public bool isRoomCounting = false;
+        public DoorState doorEnteredState = DoorState.Clear;
 
         public int lastRoomID = 0;
         public int wantToSplit = 0;
@@ -118,29 +125,36 @@ namespace LiveSplit.EscapeGoat2.State
 
         public bool HaveEnteredDoor() {
             int roomID        = (int)goatMemory.GetRoomID();
-            bool stopCounting = (bool)goatMemory.GetRoomTimerStopped();
-            bool firstFrame   = (bool)goatMemory.GetRoomHasRunFirstFrame();
-            bool timeStopped  = (firstFrame && stopCounting);
+            bool? replayPaused = goatMemory.GetReplayRecordingPaused();
 
-            //bool frozen       = (bool)goatMemory.GetRoomFrozen();
-            //bool timeStopped  = (firstFrame && stopCounting && !frozen);
-            //bool isNewRoom    = (roomID != this.lastRoomID);
-            //LogWriter.WriteLine("{0} {1} {2} {3} {4}", roomID, stopCounting, !frozen, firstFrame, isNewRoom);
-            //if (isNewRoom && this.isRoomCounting && timeStopped) {
+            if (!replayPaused.HasValue) return false;
 
-            if (this.isRoomCounting && timeStopped) {
-                this.wantToSplit++;
-                if (this.wantToSplit > 1) {
-                    LogWriter.WriteLine("Door Entered ({0} -> {1}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+            bool increasedSplitLagTimer = false;
 
-                    this.wantToSplit = 0;
-                    this.isRoomCounting = !timeStopped;
-                    this.lastRoomID = roomID;
-                    return true;
+            // If the DoorState is currently Clear
+            if (this.doorEnteredState == DoorState.Clear) {
+                // If the DoorState is clear and we have a paused replay timer
+                if (replayPaused.Value) {
+                    this.wantToSplit++;
+                    increasedSplitLagTimer = true;
+
+                    if (this.wantToSplit > 1) {
+                        LogWriter.WriteLine("Door Entered ({0} -> {1}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+
+                        this.doorEnteredState = DoorState.Entering;
+                        this.lastRoomID = roomID;
+                        return true;
+                    }
                 }
             } else {
-                this.wantToSplit = 0;
-                this.isRoomCounting = !timeStopped;
+                if (!replayPaused.Value) {
+                    this.doorEnteredState = DoorState.Clear;
+                }
+            }
+
+            // If we didn't increase the split lag timer this frame, reset the timer
+            if (!increasedSplitLagTimer) {
+                wantToSplit = 0;
             }
 
             return false;

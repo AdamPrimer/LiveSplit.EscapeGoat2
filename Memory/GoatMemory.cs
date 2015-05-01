@@ -51,22 +51,14 @@ namespace LiveSplit.EscapeGoat2.Memory
             return null;
         }
 
-        public bool? GetRoomFrozen() {
-            var roomInstance = GetRoomInstance();
-            if (roomInstance == null) return null;
-            return roomInstance.Value.GetFieldValue<Boolean>("_frozen");
-        }
-
-        public bool? GetRoomHasRunFirstFrame() {
-            var roomInstance = GetRoomInstance();
-            if (roomInstance == null) return null;
-            return roomInstance.Value.GetFieldValue<Boolean>("<HasRunFirstFrame>k__BackingField");
-        }
-
-        public bool? GetRoomTimerStopped() {
-            var roomInstance = GetRoomInstance();
-            if (roomInstance == null) return null;
-            return roomInstance.Value.GetFieldValue<Boolean>("<StopCountingElapsedTime>k__BackingField");
+        public bool? GetReplayRecordingPaused() {
+            var action = GetActionStage();
+            try {
+                return action.Value.Value.GetFieldValue<bool>("_pauseReplayRecording");
+            } catch (Exception e) {
+                LogWriter.WriteLine(e.ToString());
+                return null;
+            }
         }
 
         public int? GetSheepOrbsCollected() {
