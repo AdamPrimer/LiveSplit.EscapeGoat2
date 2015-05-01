@@ -85,9 +85,9 @@ namespace LiveSplit.EscapeGoat2.State
                 bool newSheepOrb  = (bool)HaveCollectedNewSheepOrb();
                 bool newShard     = (bool)HaveCollectedNewShard();
 
-                int roomID = (int)goatMemory.GetRoomID();
                 //LogWriter.WriteLine("{0} {1} {2} {3}", roomID, newDoor, newSheepOrb, newShard);
                 if (newDoor || newSheepOrb || newShard) {
+                    int roomID = (int)goatMemory.GetRoomID();
                     goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
                 }
             }
@@ -119,14 +119,16 @@ namespace LiveSplit.EscapeGoat2.State
         public bool HaveEnteredDoor() {
             int roomID        = (int)goatMemory.GetRoomID();
             bool stopCounting = (bool)goatMemory.GetRoomTimerStopped();
-            bool frozen       = (bool)goatMemory.GetRoomFrozen();
             bool firstFrame   = (bool)goatMemory.GetRoomHasRunFirstFrame();
-            bool timeStopped  = (firstFrame && stopCounting && !frozen);
-            bool isNewRoom    = (roomID != this.lastRoomID);
+            bool timeStopped  = (firstFrame && stopCounting);
 
+            //bool frozen       = (bool)goatMemory.GetRoomFrozen();
+            //bool timeStopped  = (firstFrame && stopCounting && !frozen);
+            //bool isNewRoom    = (roomID != this.lastRoomID);
             //LogWriter.WriteLine("{0} {1} {2} {3} {4}", roomID, stopCounting, !frozen, firstFrame, isNewRoom);
+            //if (isNewRoom && this.isRoomCounting && timeStopped) {
 
-            if (isNewRoom && this.isRoomCounting && timeStopped) {
+            if (this.isRoomCounting && timeStopped) {
                 this.wantToSplit++;
                 if (this.wantToSplit > 1) {
                     LogWriter.WriteLine("Door Entered ({0} -> {1}) {2}", this.lastRoomID, roomID, this.wantToSplit);
