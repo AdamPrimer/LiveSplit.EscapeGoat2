@@ -11,6 +11,19 @@ namespace LiveSplit.EscapeGoat2.State
         Entering
     }
 
+    public enum LevelState
+    {
+        Inside,
+        Outside
+    }
+
+    public enum PlayerState
+    {
+        Alive,
+        Dead
+        // No cats, only goats.
+    }
+
     public class GoatState
     {
         public bool isOpen = false;
@@ -20,8 +33,11 @@ namespace LiveSplit.EscapeGoat2.State
         public GoatTriggers goatTriggers;
 
         public bool isStarted = false;
-        public bool isRoomCounting = false;
         public DoorState doorEnteredState = DoorState.Clear;
+        public LevelState levelState = LevelState.Outside;
+        public PlayerState playerState = PlayerState.Dead;
+        public MapPosition currentPosition = new MapPosition(0, 0);
+        public bool hasPositionChangedSinceExit = false;
 
         public int lastRoomID = 0;
         public int wantToSplit = 0;
@@ -42,12 +58,17 @@ namespace LiveSplit.EscapeGoat2.State
 
         public void Reset() {
             this.isStarted = false;
-            this.isRoomCounting = false;
 
             this.lastRoomID = 0;
             this.wantToSplit = 0;
             this.collectedShards = 0;
             this.collectedSheepOrbs = 0;
+
+            this.doorEnteredState = DoorState.Clear;
+            this.levelState = LevelState.Outside;
+            this.playerState = PlayerState.Dead;
+            this.currentPosition = new MapPosition(0, 0);
+            this.hasPositionChangedSinceExit = false;
 
             this.lastSeen = TimeSpan.Zero;
         }
@@ -78,7 +99,12 @@ namespace LiveSplit.EscapeGoat2.State
 
                 if (this.isStarted) {
                     UpdateEndOfLevel();
+                    UpdateCurrentPosition();
                     UpdateGameTime();
+
+                    // These are currently for debugging purposes only
+                    UpdatePlayerStatus();
+                    UpdateLevelStatus();
                 }
             } catch (Exception e) { LogWriter.WriteLine(e.ToString()); }
         }
@@ -124,40 +150,86 @@ namespace LiveSplit.EscapeGoat2.State
         }
 
         public bool HaveEnteredDoor() {
-            int roomID        = (int)goatMemory.GetRoomID();
+            int roomID         = (int)goatMemory.GetRoomID();
             bool? replayPaused = goatMemory.GetReplayRecordingPaused();
-
             if (!replayPaused.HasValue) return false;
 
             bool increasedSplitLagTimer = false;
 
-            // If the DoorState is currently Clear
-            if (this.doorEnteredState == DoorState.Clear) {
-                // If the DoorState is clear and we have a paused replay timer
-                if (replayPaused.Value) {
-                    this.wantToSplit++;
-                    increasedSplitLagTimer = true;
+            // If the DoorState is clear and we have a paused replay timer
+            if (this.doorEnteredState == DoorState.Clear && replayPaused.Value) {
+                LogWriter.WriteLine("Want To Split (Last Exit {0}, This Exit {1}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+                this.wantToSplit++;
+                increasedSplitLagTimer = true;
 
-                    if (this.wantToSplit > 1) {
-                        LogWriter.WriteLine("Door Entered ({0} -> {1}) {2}", this.lastRoomID, roomID, this.wantToSplit);
-
-                        this.doorEnteredState = DoorState.Entering;
-                        this.lastRoomID = roomID;
-                        return true;
-                    }
+                if (this.wantToSplit > 1) {
+                    LogWriter.WriteLine("Door Entered (Last Exit {0}, This Exit {1}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+                    this.doorEnteredState = DoorState.Entering;
+                    this.lastRoomID = roomID;
+                    return true;
                 }
-            } else {
-                if (!replayPaused.Value) {
-                    this.doorEnteredState = DoorState.Clear;
-                }
+            
+            // If we are not already Clear but recording a replay, then set the DoorEnteredState to Clear
+            } else if (this.doorEnteredState != DoorState.Clear && !replayPaused.Value) {
+                LogWriter.WriteLine("Resetting Door State for Room {1} (Last Exit {0}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+                this.doorEnteredState = DoorState.Clear;
             }
 
             // If we didn't increase the split lag timer this frame, reset the timer
-            if (!increasedSplitLagTimer) {
+            if (!increasedSplitLagTimer && wantToSplit > 0) {
+                LogWriter.WriteLine("Resetting Want-to-Split Timer in Room {1} (Last Exit {0}) {2}", this.lastRoomID, roomID, this.wantToSplit);
                 wantToSplit = 0;
             }
 
             return false;
+        }
+
+        public void UpdateLevelStatus() {
+            int roomID         = (int)goatMemory.GetRoomID();
+            bool? replayPaused = goatMemory.GetReplayRecordingPaused();
+            if (!replayPaused.HasValue) return;
+
+            // If we are currently Outside, but we are recording a replay, transition to Inside
+            if (levelState == LevelState.Outside && !replayPaused.Value) {
+                LogWriter.WriteLine("Entering Room {1} (Last Exit {0}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+                this.levelState = LevelState.Inside;
+            }
+            // If we are currently Inside, but not recording a replay, transition to Outside
+            else if (levelState == LevelState.Inside && replayPaused.Value) {
+                LogWriter.WriteLine("Leaving Room {1} (Last Exit {0}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+                this.levelState = LevelState.Outside;
+            }
+        }
+
+        public void UpdatePlayerStatus() {
+            int roomID         = (int)goatMemory.GetRoomID();
+            bool? player       = goatMemory.GetIsPlayerObject();
+            if (!player.HasValue) return;
+
+            // If we are currently Alive, but there is no player object, transition to Dead
+            if (this.playerState == PlayerState.Alive && !player.Value) {
+                LogWriter.WriteLine("Player Object Destroyed in Room {1} (Last Exit {0}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+                this.playerState = PlayerState.Dead;
+            }
+
+            // If we are currently Dead, but there is a Player object, transition to Alive
+            else if (this.playerState == PlayerState.Dead && player.Value) {
+                LogWriter.WriteLine("Player Object Created in Room {1} (Last Exit {0}) {2}", this.lastRoomID, roomID, this.wantToSplit);
+                this.playerState = PlayerState.Alive;
+            }
+        }
+
+        public void UpdateCurrentPosition() {
+            int roomID         = (int)goatMemory.GetRoomID();
+            MapPosition? pos   = goatMemory.GetCurrentPosition();
+            if (!pos.HasValue) return;
+
+            // Check if the current position has changed
+            if (this.currentPosition._x != pos.Value._x || this.currentPosition._y != pos.Value._y) {
+                LogWriter.WriteLine("Player Position Changed in Room {1} ({3},{4} to {5},{6}) (Last Exit {0}) {2}", this.lastRoomID, roomID, this.wantToSplit, this.currentPosition._x, this.currentPosition._y, pos.Value._x, pos.Value._y);
+                this.currentPosition = pos.Value;
+                this.hasPositionChangedSinceExit = true;
+            }
         }
 
         public bool HaveCollectedNewSheepOrb() {

@@ -9,6 +9,10 @@ namespace LiveSplit.EscapeGoat2.State
     {
         public int _x;
         public int _y;
+        public MapPosition(int x, int y) {
+            _x = x;
+            _y = y;
+        }
     }
 
     public class WorldMap

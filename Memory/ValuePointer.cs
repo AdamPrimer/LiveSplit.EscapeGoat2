@@ -86,6 +86,23 @@ namespace LiveSplit.EscapeGoat2.Memory
             return Type.GetValue(address);
         }
 
+        public T ReadValue<T>() where T : new() {
+            FieldInfo[] fields = typeof(T).GetFields();
+
+            T item = new T();
+            foreach (var field in Type.Fields) {
+                if (!field.HasSimpleValue) continue;
+
+                for (int j = 0; j < fields.Length; j++) {
+                    if (fields[j].Name == field.Name) {
+                        var val = field.GetValue(Address, true);
+                        typeof(T).GetField(field.Name).SetValueDirect(__makeref(item), val);
+                    }
+                }
+            }
+            return item;
+        }
+
         public T Read<T>() {
             object res = Read();
             if (res == null) {

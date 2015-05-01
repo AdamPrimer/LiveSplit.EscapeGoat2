@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using LiveSplit.EscapeGoat2.State;
 using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.Memory
@@ -55,6 +56,29 @@ namespace LiveSplit.EscapeGoat2.Memory
             var action = GetActionStage();
             try {
                 return action.Value.Value.GetFieldValue<bool>("_pauseReplayRecording");
+            } catch (Exception e) {
+                LogWriter.WriteLine(e.ToString());
+                return null;
+            }
+        }
+
+        public bool? GetIsPlayerObject() {
+            var action = GetActionStage();
+            try {
+                return action.Value.Value.GetFieldValue<bool>("_player");
+            } catch (Exception e) {
+                LogWriter.WriteLine(e.ToString());
+                return null;
+            }
+        }
+
+        public MapPosition? GetCurrentPosition() {
+            var action = GetActionStage();
+            var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
+            if (!state.HasValue) return null;
+
+            try {
+                return state.Value["_currentPosition"].Value.ReadValue<MapPosition>();
             } catch (Exception e) {
                 LogWriter.WriteLine(e.ToString());
                 return null;
