@@ -3,7 +3,7 @@ using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.State
 {
-    public class SplitEventArgs : EventArgs
+    public struct SplitEventArgs : EventArgs
     {
         public string name { get; set; }
         public object value { get; set; }
@@ -15,24 +15,18 @@ namespace LiveSplit.EscapeGoat2.State
 
     public class GoatTriggers
     {
+        // This function is called when an event that will trigger an action in LiveSplit occurs
         public event SplitEventHandler OnSplit;
 
+        // This is the required signature of the OnSplit function.
         public delegate void SplitEventHandler(object sender, SplitEventArgs e);
 
-        public bool timerRunning = false;
-
         public void SplitOnGameStart(bool status) {
-            if (OnSplit != null) {
-                OnSplit(this, new SplitEventArgs("Start", status));
-            } else {
-                LogWriter.WriteLine("Onsplit is null");
-            }
+            if (OnSplit != null) OnSplit(this, new SplitEventArgs("Start", status));
         }
 
         public void SplitOnEndRoom(Room room) {
-            if (OnSplit != null) {
-                OnSplit(this, new SplitEventArgs("End Room", room));
-            }
+            if (OnSplit != null) OnSplit(this, new SplitEventArgs("End Room", room));
         }
     }
 }

@@ -77,7 +77,7 @@ namespace LiveSplit.EscapeGoat2.Memory
                 T item = new T();
                 foreach (var field in type.ArrayComponentType.Fields) {
                     if (!field.HasSimpleValue) continue;
-                     
+
                     for (int j = 0; j < fields.Length; j++) {
                         if (fields[j].Name == field.Name) {
                             var val = field.GetValue(addr, true);

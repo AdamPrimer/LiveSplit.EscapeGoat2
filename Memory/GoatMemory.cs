@@ -164,7 +164,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public void Dispose() {
-            if (pm != null)   this.pm.Dispose();
+            if (pm != null) this.pm.Dispose();
             if (proc != null) this.proc.Dispose();
         }
 

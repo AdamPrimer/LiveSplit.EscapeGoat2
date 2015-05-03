@@ -80,7 +80,7 @@ namespace LiveSplit.EscapeGoat2.Memory
             ulong address = Address;
             // This is required due to a bug in Microsoft.Diagnostics.Runtime
             if (Type.IsPrimitive) {
-               address -= (ulong)((long)this.Heap.PointerSize);
+                address -= (ulong)((long)this.Heap.PointerSize);
             }
 
             return Type.GetValue(address);

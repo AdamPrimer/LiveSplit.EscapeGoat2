@@ -83,7 +83,7 @@ namespace LiveSplit.EscapeGoat2.State
             bool isNowOpen = (goatMemory.HookProcess() && !goatMemory.proc.HasExited);
             if (isNowOpen != isOpen) {
                 if (!isNowOpen) LogWriter.WriteLine("escapegoat2.exe is unavailable.");
-                else            LogWriter.WriteLine("escapegoat2.exe is available.");
+                else LogWriter.WriteLine("escapegoat2.exe is available.");
                 isOpen = isNowOpen;
             }
 
@@ -183,7 +183,7 @@ namespace LiveSplit.EscapeGoat2.State
                 this.doorEnteredState = DoorState.Entering;
                 return true;
             }
-            
+
             // If we are not already Clear but recording a replay, then set the DoorEnteredState to Clear
             else if (this.doorEnteredState != DoorState.Clear && !replayPaused.Value) {
                 LogWriter.WriteLine("Resetting Door State for Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
@@ -206,7 +206,7 @@ namespace LiveSplit.EscapeGoat2.State
 
                 this.levelState = LevelState.Inside;
             }
-            // If we are currently Inside, but not recording a replay, transition to Outside
+                // If we are currently Inside, but not recording a replay, transition to Outside
             else if (levelState == LevelState.Inside && replayPaused.Value) {
                 LogWriter.WriteLine("Leaving Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
 
