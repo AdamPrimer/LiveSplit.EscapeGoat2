@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<updates>
+  <update version="0.9.2">
+    <files>
+      <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
+    </files>
+    <changelog>
+      <change>
+        Added support for LiveSplit updates.
+      </change>
+    </changelog>
+  </update>
+  <update version="0.9.1">
+    <files>
+      <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
+    </files>
+    <changelog>
+      <change>
+        More slight refactoring/tidying and comments
+      </change>
+    </changelog>
+  </update>
+</updates>

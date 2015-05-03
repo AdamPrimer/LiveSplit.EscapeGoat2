@@ -137,10 +137,14 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Components\LiveSplit.EscapeGoat2.Updates.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if exist "C:\Users\Adam\Downloads\LiveSplit_1.5.5\Components\" (
+    <PostBuildEvent>copy $(TargetPath) "$(SolutionDir)Components\$(TargetFileName)
+copy $(SolutionDir)\lib\Microsoft.Diagnostics.Runtime.dll "$(SolutionDir)Components\Microsoft.Diagnostics.Runtime.dll"
+if exist "C:\Users\Adam\Downloads\LiveSplit_1.5.5\Components\" (
 copy $(TargetPath) "C:\Users\Adam\Downloads\LiveSplit_1.5.5\Components\$(TargetFileName)
 )
 if exist "C:\Users\Adam\Downloads\LiveSplit_1.5.5\Components\" (

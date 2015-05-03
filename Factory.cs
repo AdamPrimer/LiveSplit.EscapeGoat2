@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using LiveSplit.UI.Components;
 using LiveSplit.Model;
 
@@ -7,7 +8,7 @@ namespace LiveSplit.EscapeGoat2
     public class Factory : IComponentFactory
     {
         public string ComponentName {
-            get { return "Escape Goat 2 Autosplitter"; }
+            get { return "Escape Goat 2 Autosplitter v" + this.Version.ToString(); }
         }
 
         public string Description {
@@ -23,19 +24,19 @@ namespace LiveSplit.EscapeGoat2
         }
 
         public string UpdateName {
-            get { return ""; }
+            get { return this.ComponentName; }
         }
 
         public string UpdateURL {
-            get { return "http://livesplit.org/update/"; }
+            get { return "https://raw.githubusercontent.com/AdamPrimer/LiveSplit.EscapeGoat2/master/"; }
         }
 
         public Version Version {
-            get { return new Version(); }
+            get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
 
         public string XMLURL {
-            get { return "http://livesplit.org/update/Components/noupdates.xml"; }
+            get { return this.UpdateURL + "Components/LiveSplit.EscapeGoat2.Updates.xml"; }
         }
     }
 }
