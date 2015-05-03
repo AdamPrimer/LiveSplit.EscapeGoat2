@@ -59,6 +59,13 @@ accuracy, CPU performance and the latency in the splits. The current settings
 have been chosen to maximise accuracy and minimise CPU performance without
 considerable noticable latency.
 
+# For Developers #
+
+The following information is only for people who wish to modify, understand, or
+reuse this code either to update it for future patches/changes or perhaps to
+use it as the basis for their own autosplitter. If you are a user, you need not
+continue past this point.
+
 ## Build Intructions ##
 
 1. Download the source
@@ -131,3 +138,39 @@ without needing to know their type.
 This is just a brief summary of each file, I hope it provides a decent starting
 point for understanding the code base for any future modifications, or fixes,
 provided by others in the future.
+
+## Releasing a New Version ##
+
+1. Make whatever changes you like
+2. Build and test the autosplitter still actually works.
+    - Test new game works
+    - Test regular rooms split
+    - Test sheep rooms split
+    - Test shard rooms split
+    - Reset LiveSplit and check a new game still works
+3. Update `Properties/AssemblyInfo.cs`
+    - Update `AssemblyVersion`
+    - Update `AssemblyFileVersion`
+4. Update `Components\LiveSplit.EscapeGoat2.Updates.xml`
+    - Add a new update to the XML with the appropriate version and change log
+5. Commit and push the changes to GitHub
+6. LiveSplit should now detect the new version when opening it for your users!
+
+## Changing the Release Channel ## 
+
+In the event this distribution goes dark and someone else has to fork this
+release, it is quite simple to change the automatic update channel.
+
+1. Modify `Factory.cs`
+2. Change `UpdateURL` to be the URL to where you will host
+   `LiveSplit.EscapeGoat2.Updates.xml`. 
+3. If you change the directory structure/name you will also need to modify
+   `XMLURL`.
+
+Please note, making this change will not get it detected by existing users,
+they will need to manually update to the new fork at least once before updates
+will be detected from then on. 
+
+It is therefore my sincere desire to keep this fork alive by accepting pull
+requests, as well as am I willing to push an update over this fork
+transitioning users to another fork should a developer take up the mantle.
