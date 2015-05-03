@@ -83,8 +83,8 @@ initalize the component, and hence needs to initialize the autosplitters state.
 description. This is the class that actually defines that we should call the
 `EscapeGoat2Component` found in `Component.cs`.
 
-The autosplitter is then broken into 2 primary files (`State/GoatState.cs` and
-`Memory/GoatMemory.cs`, and a secondary file (`State/GoatTriggers.cs`).
+The autosplitter is then broken into 2 primary files: `State/GoatState.cs` and
+`Memory/GoatMemory.cs`, and a secondary file `State/GoatTriggers.cs`.
 
 `GoatState.cs` initializes both `GoatMemory` and `GoatTriggers`. It calls
 `GoatMemory` extensively to maintain the state of the autosplitter. When the
