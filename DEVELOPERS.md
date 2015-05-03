@@ -95,7 +95,7 @@ provided by others in the future.
 5. Commit and push the changes to GitHub
 6. LiveSplit should now detect the new version when opening it for your users!
 
-## Changing the Release Channel ## 
+## Changing the Release Channel ##
 
 In the event this distribution goes dark and someone else has to fork this
 release, it is quite simple to change the automatic update channel.
