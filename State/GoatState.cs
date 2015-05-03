@@ -32,22 +32,24 @@ namespace LiveSplit.EscapeGoat2.State
         public GoatMemory goatMemory;
         public GoatTriggers goatTriggers;
 
-        public bool isStarted = false;
-        public DoorState doorEnteredState = DoorState.Clear;
-        public LevelState levelState = LevelState.Outside;
-        public PlayerState playerState = PlayerState.Dead;
-        public MapPosition currentPosition = new MapPosition(0, 0);
-        public bool hasPositionChangedSinceExit = false;
+        public bool isStarted = false;                                  // Set to True when New Game is selected.
+        public DoorState doorEnteredState = DoorState.Clear;            // Set to Entering on entering a door, set Clear on entering a room
+        public MapPosition currentPosition = new MapPosition(0, 0);     // The current map location of the player
+        public bool hasPositionChangedSinceExit = false;                // Set to False when doorEnteredState is set to True, set to True when currentPosition changes.
 
-        public int lastRoomID = 0;
-        public int collectedShards = 0;
-        public int collectedSheepOrbs = 0;
+        // Used for debugging purposes
+        public LevelState levelState = LevelState.Outside;              // Set to Outside when exiting a room, set to Inside when entering a room.
+        public PlayerState playerState = PlayerState.Dead;              // Set to Alive when the Goat is created, set to Dead when the Goat is destroyed (death).
 
-        public TimeSpan lastSeen = TimeSpan.Zero;
+        public int lastRoomID = 0;                                      // The room ID of the last room an exit occured on
+        public int collectedShards = 0;                                 // The number of collected Glass Fragments (called Shards internally)
+        public int collectedSheepOrbs = 0;                              // The number of collected Sheep Orbs
 
-        public event EventHandler OnTimerFixed;
-        public event EventHandler OnTimerChanged;
-        public event EventHandler OnTimerUpdated;
+        public TimeSpan lastSeen = TimeSpan.Zero;                       // The last time the player was seen (in In-Game Time)
+
+        public event EventHandler OnTimerFixed;                         // Fires whenever the IGT between updates has not changed
+        public event EventHandler OnTimerChanged;                       // Fires whenever the IGT between updates has changed
+        public event EventHandler OnTimerUpdated;                       // Fires every update after the IGT is updated.
 
         public GoatState() {
             map = new WorldMap();
@@ -57,56 +59,66 @@ namespace LiveSplit.EscapeGoat2.State
 
         public void Reset() {
             this.isStarted = false;
+            this.hasPositionChangedSinceExit = false;
 
             this.lastRoomID = 0;
             this.collectedShards = 0;
             this.collectedSheepOrbs = 0;
 
-            this.doorEnteredState = DoorState.Clear;
             this.levelState = LevelState.Outside;
             this.playerState = PlayerState.Dead;
-            this.currentPosition = new MapPosition(0, 0);
-            this.hasPositionChangedSinceExit = false;
+            this.doorEnteredState = DoorState.Clear;
 
             this.lastSeen = TimeSpan.Zero;
+            this.currentPosition = new MapPosition(0, 0);
         }
 
         public void Dispose() {
+            // Unhook from reading the game memory
             goatMemory.Dispose();
         }
 
         public void Loop() {
+            // Hook the game process so we can read the memory
             bool isNowOpen = (goatMemory.HookProcess() && !goatMemory.proc.HasExited);
-
             if (isNowOpen != isOpen) {
                 if (!isNowOpen) LogWriter.WriteLine("escapegoat2.exe is unavailable.");
                 else            LogWriter.WriteLine("escapegoat2.exe is available.");
                 isOpen = isNowOpen;
             }
 
+            // If we're open, do all the magic
             if (isOpen) Pulse();
-
-            goatMemory.ClearCaches();
         }
 
         public void Pulse() {
             try {
-                if (!this.isStarted) {
-                    UpdateStartOfGame();
-                }
+                // If we haven't detected the start of a new game, check the memory for the event
+                if (!this.isStarted) UpdateStartOfGame();
 
+                // If we have detected the start of a game, then check for end of level events and updated in-game time.
                 if (this.isStarted) {
                     UpdateEndOfLevel();
                     UpdateGameTime();
                 }
             } catch (Exception e) { LogWriter.WriteLine(e.ToString()); }
+
+            // We cache memory pointers during each pulse inside goatMemory for performance reasons,
+            // we need to manually clear the cache here so that goatMemory knows we are done making
+            // calls to it and that we do not need these values anymore.
+            goatMemory.ClearCaches();
         }
 
         public void UpdateEndOfLevel() {
+            // All of our checks are dependent on there being an active room available. 
+            // This requires both the RoomInstance to be available, and that we are on 
+            // the "ActionStage" in the SceneManager indicating that the RoomInstance 
+            // is the active scene.
             var roomInstance = goatMemory.GetRoomInstance();
             bool isOnAction  = (bool)goatMemory.GetOnActionStage();
 
             if (roomInstance != null && isOnAction) {
+                // Check for position changes indicating that the player has moved on the map
                 UpdateCurrentPosition();
 
                 // These are currently for debugging only
@@ -117,7 +129,8 @@ namespace LiveSplit.EscapeGoat2.State
                 bool newSheepOrb  = (bool)HaveCollectedNewSheepOrb();
                 bool newShard     = (bool)HaveCollectedNewShard();
 
-                //LogWriter.WriteLine("{0} {1} {2} {3}", roomID, newDoor, newSheepOrb, newShard);
+                // A room ends on one of three conditions, a door is entered, a glass fragment (shard) 
+                // is collected, or a sheep orb is collected.
                 if (newDoor || newSheepOrb || newShard) {
                     int roomID = (int)goatMemory.GetRoomID();
                     goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
@@ -126,6 +139,7 @@ namespace LiveSplit.EscapeGoat2.State
         }
 
         public void UpdateStartOfGame() {
+            // If selecting "New Game" is detected, then call the start game trigger.
             bool isStarted = goatMemory.GetStartOfGame();
             if (this.isStarted != isStarted) {
                 goatTriggers.SplitOnGameStart(isStarted);
@@ -135,38 +149,45 @@ namespace LiveSplit.EscapeGoat2.State
 
         public void UpdateGameTime() {
             TimeSpan now = goatMemory.GetGameTime();
-            
-            if (now == this.lastSeen) {
-                if (this.OnTimerFixed != null) this.OnTimerFixed(now, EventArgs.Empty);
-            } else if (now > this.lastSeen && now - this.lastSeen < TimeSpan.FromSeconds(2)) {
-                this.lastSeen = now;
-                if (this.OnTimerChanged != null) this.OnTimerChanged(now, EventArgs.Empty);
-            }
 
-            if (now >= this.lastSeen && now - this.lastSeen < TimeSpan.FromSeconds(2)) {
-                if (this.OnTimerUpdated != null) this.OnTimerUpdated(now, EventArgs.Empty);
+            // Sanity check, do not update time if it is a huge jump.
+            if (now < this.lastSeen || now - this.lastSeen > TimeSpan.FromSeconds(2)) return;
+
+            // Call all the relevant IGT based events depending on the time delta since the last pulse.
+            this.lastSeen = now;
+            if (this.OnTimerUpdated != null) this.OnTimerUpdated(now, EventArgs.Empty);
+
+            if (now > this.lastSeen) {
+                if (this.OnTimerChanged != null) this.OnTimerChanged(now, EventArgs.Empty);
+            } else {
+                if (this.OnTimerFixed != null) this.OnTimerFixed(now, EventArgs.Empty);
             }
         }
 
         public bool HaveEnteredDoor() {
+            // If we haven't updated our map position since the last exit, then we don't want to trigger another
+            // exit. This is to prevent issues with double splitting.
             if (!this.hasPositionChangedSinceExit) return false;
 
-            int roomID         = (int)goatMemory.GetRoomID();
+            // We detect a room exit by seeing it the ReplayRecordingPaused is set to True
             bool? replayPaused = goatMemory.GetReplayRecordingPaused();
             if (!replayPaused.HasValue) return false;
 
-            // If the DoorState is clear and we have a paused replay timer
+            // If the DoorState is clear and we have a paused replay timer, then set the DoorEnteredState to Entering
             if (this.doorEnteredState == DoorState.Clear && replayPaused.Value) {
+                int roomID = (int)goatMemory.GetRoomID();
                 LogWriter.WriteLine("Door Entered (Last Exit {0}, This Exit {1})", this.lastRoomID, roomID);
-                this.doorEnteredState = DoorState.Entering;
+
                 this.lastRoomID = roomID;
                 this.hasPositionChangedSinceExit = false;
+                this.doorEnteredState = DoorState.Entering;
                 return true;
             }
             
             // If we are not already Clear but recording a replay, then set the DoorEnteredState to Clear
             else if (this.doorEnteredState != DoorState.Clear && !replayPaused.Value) {
-                LogWriter.WriteLine("Resetting Door State for Room {1} (Last Exit {0})", this.lastRoomID, roomID);
+                LogWriter.WriteLine("Resetting Door State for Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
+
                 this.doorEnteredState = DoorState.Clear;
             }
 
@@ -174,57 +195,68 @@ namespace LiveSplit.EscapeGoat2.State
         }
 
         public void UpdateLevelStatus() {
-            int roomID         = (int)goatMemory.GetRoomID();
+            // We detect a room exit by seeing it the ReplayRecordingPaused is set to True,
+            // this is set back to False when we enter a new room.
             bool? replayPaused = goatMemory.GetReplayRecordingPaused();
             if (!replayPaused.HasValue) return;
 
             // If we are currently Outside, but we are recording a replay, transition to Inside
             if (levelState == LevelState.Outside && !replayPaused.Value) {
-                LogWriter.WriteLine("Entering Room {1} (Last Exit {0})", this.lastRoomID, roomID);
+                LogWriter.WriteLine("Entering Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
+
                 this.levelState = LevelState.Inside;
             }
             // If we are currently Inside, but not recording a replay, transition to Outside
             else if (levelState == LevelState.Inside && replayPaused.Value) {
-                LogWriter.WriteLine("Leaving Room {1} (Last Exit {0})", this.lastRoomID, roomID);
+                LogWriter.WriteLine("Leaving Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
+
                 this.levelState = LevelState.Outside;
             }
         }
 
         public void UpdatePlayerStatus() {
-            int roomID         = (int)goatMemory.GetRoomID();
-            bool? player       = goatMemory.GetIsPlayerObject();
+            // This checks when the Goat player object exists. It is set to True when entering the first room, 
+            // and is set to False when the player dies. It is set to True again once respawned.
+            bool? player = goatMemory.GetIsPlayerObject();
             if (!player.HasValue) return;
 
             // If we are currently Alive, but there is no player object, transition to Dead
             if (this.playerState == PlayerState.Alive && !player.Value) {
-                LogWriter.WriteLine("Player Object Destroyed in Room {1} (Last Exit {0})", this.lastRoomID, roomID);
+                LogWriter.WriteLine("Player Object Destroyed in Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
                 this.playerState = PlayerState.Dead;
             }
 
             // If we are currently Dead, but there is a Player object, transition to Alive
             else if (this.playerState == PlayerState.Dead && player.Value) {
-                LogWriter.WriteLine("Player Object Created in Room {1} (Last Exit {0})", this.lastRoomID, roomID);
+                LogWriter.WriteLine("Player Object Created in Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
                 this.playerState = PlayerState.Alive;
             }
         }
 
         public void UpdateCurrentPosition() {
-            int roomID         = (int)goatMemory.GetRoomID();
-            MapPosition? pos   = goatMemory.GetCurrentPosition();
+            // This is the player's current position on the game map. This is updated after a level exit to be
+            // the next room whether you actually enter that room or navigate to another room. Therefore, this
+            // position will change (triggering hasPositionChangedSinceExit) even if you finish a room, then
+            // navigate back to the same room to do it again. So even though the same room is done twice in a
+            // row, we will still know they are seperate exits.
+            MapPosition? pos = goatMemory.GetCurrentPosition();
             if (!pos.HasValue) return;
 
             // Check if the current position has changed
             if (this.currentPosition._x != pos.Value._x || this.currentPosition._y != pos.Value._y) {
-                LogWriter.WriteLine("Player Position Changed in Room {1} ({2},{3} to {4},{5}) (Last Exit {0})", this.lastRoomID, roomID, this.currentPosition._x, this.currentPosition._y, pos.Value._x, pos.Value._y);
+                LogWriter.WriteLine("Player Position Changed in Room {1} ({2},{3} to {4},{5}) (Last Exit {0})",
+                        this.lastRoomID, (int)goatMemory.GetRoomID(), this.currentPosition._x, this.currentPosition._y, pos.Value._x, pos.Value._y);
                 this.currentPosition = pos.Value;
                 this.hasPositionChangedSinceExit = true;
             }
         }
 
         public bool HaveCollectedNewSheepOrb() {
+            // We detect a Sheep Orb is collected because the length of the game's SheepOrbsCollected array increases.
             int curSheepOrbsCollected = this.collectedSheepOrbs;
             int numSheepOrbsCollected = (int)goatMemory.GetSheepOrbsCollected();
 
+            // Check if we have more sheep orbs than we used to
             if (numSheepOrbsCollected > curSheepOrbsCollected) {
                 int roomID = (int)goatMemory.GetRoomID();
                 LogWriter.WriteLine("Sheep Orb Obtained: {0} -> {1} ({2} -> {3})", this.collectedSheepOrbs, numSheepOrbsCollected, this.lastRoomID, roomID);
@@ -236,9 +268,12 @@ namespace LiveSplit.EscapeGoat2.State
         }
 
         public bool HaveCollectedNewShard() {
+            // We detect a Sheep Orb is collected because the length of the game's SecretRoomsBeaten array increases,
+            // which is equivalent to saying a Glass Fragment (shard) was collected.
             int curShardsCollected = this.collectedShards;
             int numShardsCollected = (int)goatMemory.GetShardsCollected();
 
+            // Check if we have more glass fragments than we used to
             if (numShardsCollected > curShardsCollected) {
                 int roomID = (int)goatMemory.GetRoomID();
                 LogWriter.WriteLine("Shard Obtained: {0} -> {1} ({2} -> {3})", this.collectedShards, numShardsCollected, this.lastRoomID, roomID);

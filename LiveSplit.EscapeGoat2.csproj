@@ -80,7 +80,7 @@
       <HintPath>..\..\..\..\..\Users\Adam\Downloads\LiveSplit_1.5.5\LiveSplit.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Diagnostics.Runtime, Version=0.8.26.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Diagnostics.Runtime, Version=0.8.27.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Microsoft.Diagnostics.Runtime.dll</HintPath>
     </Reference>
@@ -112,7 +112,9 @@
     <Compile Include="State\Room.cs" />
     <Compile Include="State\WorldMap.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
       <Visible>False</Visible>
@@ -135,6 +137,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if exist "C:\Users\Adam\Downloads\LiveSplit_1.5.5\Components\" (
