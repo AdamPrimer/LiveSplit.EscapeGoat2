@@ -3,7 +3,7 @@ using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.State
 {
-    public struct SplitEventArgs : EventArgs
+    public class SplitEventArgs : EventArgs
     {
         public string name { get; set; }
         public object value { get; set; }
