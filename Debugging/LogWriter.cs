@@ -9,18 +9,20 @@ namespace LiveSplit.EscapeGoat2.Debugging
     public class LogWriter
     {
         public static void WriteLine(string format, params object[] arg) {
-            #if DEBUG
+#if DEBUG
             string str = format;
-            if (arg.Length > 0) 
+            if (arg.Length > 0)
                 str = String.Format(format, arg);
 
             StreamWriter wr = new StreamWriter("_goatauto.log", true);
             wr.WriteLine("[" + DateTime.Now + "] " + str);
             wr.Close();
-            #endif
+#endif
         }
 
         public void ViewFields(ValuePointer point) {
+            // This method is only used during debugging and development. It allows the inspection of the values
+            // and fields of a `ValuePointer` which is handy for traversing the memory structure of Escape Goat 2.
             LogWriter.WriteLine(point.Type.Name.ToString());
             foreach (var field in point.Type.Fields) {
                 string output;

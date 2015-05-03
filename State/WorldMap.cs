@@ -5,6 +5,9 @@ using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.State
 {
+    // The internal variables here are named inconsitently to the wider project as this structure
+    // mimics the `MapPosition` struct used internally by Escape Goat 2. By keeping the variables
+    // as `_x` and `_y` we can read variables of type `MapPosition` from memory more cleanly.
     public struct MapPosition
     {
         public int _x;

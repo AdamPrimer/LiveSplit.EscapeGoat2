@@ -6,7 +6,6 @@ using LiveSplit.EscapeGoat2.Debugging;
 
 namespace LiveSplit.EscapeGoat2.Memory
 {
-
     public struct ArrayPointer
     {
         public readonly ValuePointer Value;
