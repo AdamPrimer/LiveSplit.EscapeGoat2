@@ -92,8 +92,9 @@ provided by others in the future.
     - Update `AssemblyFileVersion`
 4. Update `Components/LiveSplit.EscapeGoat2.Updates.xml`
     - Add a new update to the XML with the appropriate version and change log
-5. Commit and push the changes to GitHub
-6. LiveSplit should now detect the new version when opening it for your users!
+5. Ensure you rebuild the project so the `Components` directory is updated.
+6. Commit and push the changes to GitHub
+7. LiveSplit should now detect the new version when opening it for your users!
 
 ## Changing the Release Channel ##
 
