@@ -8,6 +8,8 @@ namespace LiveSplit.EscapeGoat2.Memory
 {
     public class GoatMemory
     {
+        private const float mangleDelay = 2.5f;
+
         public Process proc;
         public ProcessMangler pm;
 
@@ -93,12 +95,8 @@ namespace LiveSplit.EscapeGoat2.Memory
             var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
             if (!state.HasValue) return null;
 
-            try {
-                ArrayPointer sheepOrbs = new ArrayPointer(state.Value, "_orbObtainedPositions", "MagicalTimeBean.Bastille.LevelData.MapPosition");
-                return sheepOrbs.Length;
-            } catch (Exception e) { LogWriter.WriteLine(e.ToString()); }
-
-            return 0;
+            ArrayPointer sheepOrbs = new ArrayPointer(state.Value, "_orbObtainedPositions", "MagicalTimeBean.Bastille.LevelData.MapPosition");
+            return sheepOrbs.Length;
         }
 
         public int? GetShardsCollected() {
@@ -109,12 +107,8 @@ namespace LiveSplit.EscapeGoat2.Memory
             var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
             if (!state.HasValue) return null;
 
-            try {
-                ArrayPointer secretRooms = new ArrayPointer(state.Value, "_secretRoomsBeaten", "MagicalTimeBean.Bastille.LevelData.MapPosition");
-                return secretRooms.Length;
-            } catch (Exception e) { LogWriter.WriteLine(e.ToString()); }
-
-            return 0;
+            ArrayPointer secretRooms = new ArrayPointer(state.Value, "_secretRoomsBeaten", "MagicalTimeBean.Bastille.LevelData.MapPosition");
+            return secretRooms.Length;
         }
 
         public TimeSpan GetGameTime() {
@@ -171,13 +165,13 @@ namespace LiveSplit.EscapeGoat2.Memory
             // opening the game, it will cause all sorts of problems. These are resolved simply
             // by waiting two seconds between hooking the process and starting the `ProcessMangler`
             // leaving ample time for the process to initialise before starting to read from it.
-            if (!this.isMangled && this.isHooked && hookedTime.AddSeconds(2) < DateTime.Now) {
+            if (!this.isMangled && this.isHooked && hookedTime.AddSeconds(GoatMemory.mangleDelay) < DateTime.Now) {
                 try {
                     pm = new ProcessMangler(proc.Id);
                     this.isMangled = true;
                 } catch (Exception e) {
-                    LogWriter.WriteLine(e.ToString());
                     proc.Dispose();
+                    throw e;
                 }
             }
 
@@ -202,7 +196,7 @@ namespace LiveSplit.EscapeGoat2.Memory
                     staticCache[key] = new StaticField(pm.Runtime, klass, fieldName);
                 } catch (Exception e) {
                     LogWriter.WriteLine(key);
-                    LogWriter.WriteLine(e.ToString());
+                    throw e;
                 }
             }
             return staticCache[key];
@@ -220,7 +214,7 @@ namespace LiveSplit.EscapeGoat2.Memory
                     pointerCache[key] = vp.Value;
                 } catch (Exception e) {
                     LogWriter.WriteLine(key);
-                    LogWriter.WriteLine(e.ToString());
+                    throw e;
                 }
             }
             return pointerCache[key];

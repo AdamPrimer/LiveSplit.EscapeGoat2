@@ -51,6 +51,9 @@ namespace LiveSplit.EscapeGoat2.State
         public event EventHandler OnTimerChanged;                       // Fires whenever the IGT between updates has changed
         public event EventHandler OnTimerUpdated;                       // Fires every update after the IGT is updated.
 
+        public int exceptionsCaught = 0;
+        public int totalExceptionsCaught = 0;
+
         public GoatState() {
             map = new WorldMap();
             goatMemory = new GoatMemory();
@@ -71,6 +74,9 @@ namespace LiveSplit.EscapeGoat2.State
 
             this.lastSeen = TimeSpan.Zero;
             this.currentPosition = new MapPosition(0, 0);
+
+            this.exceptionsCaught = 0;
+            this.totalExceptionsCaught = 0;
         }
 
         public void Dispose() {
@@ -79,29 +85,43 @@ namespace LiveSplit.EscapeGoat2.State
         }
 
         public void Loop() {
-            // Hook the game process so we can read the memory
-            bool isNowOpen = (goatMemory.HookProcess() && !goatMemory.proc.HasExited);
-            if (isNowOpen != isOpen) {
-                if (!isNowOpen) LogWriter.WriteLine("escapegoat2.exe is unavailable.");
-                else LogWriter.WriteLine("escapegoat2.exe is available.");
-                isOpen = isNowOpen;
-            }
+            try {
+                // Hook the game process so we can read the memory
+                bool isNowOpen = (goatMemory.HookProcess() && !goatMemory.proc.HasExited);
+                if (isNowOpen != isOpen) {
+                    if (!isNowOpen) LogWriter.WriteLine("escapegoat2.exe is unavailable.");
+                    else LogWriter.WriteLine("escapegoat2.exe is available.");
+                    isOpen = isNowOpen;
+                }
 
-            // If we're open, do all the magic
-            if (isOpen) Pulse();
+                // If we're open, do all the magic
+                if (isOpen) Pulse();
+            } catch (Exception e) {
+                if (this.exceptionsCaught < 10 && this.totalExceptionsCaught < 30) {
+                    this.exceptionsCaught++;
+                    this.totalExceptionsCaught++;
+                    LogWriter.WriteLine("Exception #{0}: {1}", this.exceptionsCaught, e.ToString());
+                } else if (this.totalExceptionsCaught < 30) {
+                    LogWriter.WriteLine("Too many exceptions, rebooting autosplitter.");
+                    this.goatMemory.Dispose();
+                    this.goatMemory = new GoatMemory();
+                    this.exceptionsCaught = 0;
+                } else if (this.totalExceptionsCaught == 30) {
+                    LogWriter.WriteLine("Too many total exceptions, no longer logging them.");
+                    this.totalExceptionsCaught++;
+                }
+            }
         }
 
         public void Pulse() {
-            try {
-                // If we haven't detected the start of a new game, check the memory for the event
-                if (!this.isStarted) UpdateStartOfGame();
+            // If we haven't detected the start of a new game, check the memory for the event
+            if (!this.isStarted) UpdateStartOfGame();
 
-                // If we have detected the start of a game, then check for end of level events and updated in-game time.
-                if (this.isStarted) {
-                    UpdateEndOfLevel();
-                    UpdateGameTime();
-                }
-            } catch (Exception e) { LogWriter.WriteLine(e.ToString()); }
+            // If we have detected the start of a game, then check for end of level events and updated in-game time.
+            if (this.isStarted) {
+                UpdateEndOfLevel();
+                UpdateGameTime();
+            }
 
             // We cache memory pointers during each pulse inside goatMemory for performance reasons,
             // we need to manually clear the cache here so that goatMemory knows we are done making
