@@ -1,5 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+  <update version="0.9.3">
+    <files>
+      <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
+    </files>
+    <changelog>
+      <change>
+        Bounded exception logging to avoid the log ballooning in size if there is a problem.
+      </change>
+      <change>
+        Delayed the hooking of the process to hopefully avoid exception issues in the first place.
+      </change>
+    </changelog>
+  </update>
   <update version="0.9.2">
     <files>
       <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
