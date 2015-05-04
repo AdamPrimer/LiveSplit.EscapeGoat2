@@ -174,7 +174,6 @@ namespace LiveSplit.EscapeGoat2.State
             if (now < this.lastSeen || now - this.lastSeen > TimeSpan.FromSeconds(2)) return;
 
             // Call all the relevant IGT based events depending on the time delta since the last pulse.
-            this.lastSeen = now;
             if (this.OnTimerUpdated != null) this.OnTimerUpdated(now, EventArgs.Empty);
 
             if (now > this.lastSeen) {
@@ -182,6 +181,8 @@ namespace LiveSplit.EscapeGoat2.State
             } else {
                 if (this.OnTimerFixed != null) this.OnTimerFixed(now, EventArgs.Empty);
             }
+
+            this.lastSeen = now;
         }
 
         public bool HaveEnteredDoor() {
