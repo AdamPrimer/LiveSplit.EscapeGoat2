@@ -39,6 +39,16 @@ namespace LiveSplit.EscapeGoat2
         public override void Dispose() {
             // We need to appropriately dispose of the goatState as it will unhook from the process
             goatState.Dispose();
+
+            if (Model != null) {
+                Model.CurrentState.OnReset -= OnReset;
+                Model.CurrentState.OnPause -= OnPause;
+                Model.CurrentState.OnResume -= OnResume;
+                Model.CurrentState.OnStart -= OnStart;
+                Model.CurrentState.OnSplit -= OnSplit;
+                Model.CurrentState.OnSkipSplit -= OnSkipSplit;
+                Model.CurrentState.OnUndoSplit -= OnUndoSplit;
+            }
         }
 
         public override void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode) {
