@@ -278,14 +278,14 @@ namespace LiveSplit.EscapeGoat2.State
             int numSheepOrbsCollected = (int)goatMemory.GetSheepOrbsCollected();
 
             // Check if we have more sheep orbs than we used to
-            if (numSheepOrbsCollected > curSheepOrbsCollected) {
+            if (numSheepOrbsCollected == curSheepOrbsCollected + 1) {
                 int roomID = (int)goatMemory.GetRoomID();
                 LogWriter.WriteLine("Sheep Orb Obtained: {0} -> {1} ({2} -> {3})", this.collectedSheepOrbs, numSheepOrbsCollected, this.lastRoomID, roomID);
                 this.lastRoomID = roomID;
             }
 
             this.collectedSheepOrbs = numSheepOrbsCollected;
-            return (numSheepOrbsCollected > curSheepOrbsCollected);
+            return (numSheepOrbsCollected == curSheepOrbsCollected + 1);
         }
 
         public bool HaveCollectedNewShard() {
@@ -295,14 +295,14 @@ namespace LiveSplit.EscapeGoat2.State
             int numShardsCollected = (int)goatMemory.GetShardsCollected();
 
             // Check if we have more glass fragments than we used to
-            if (numShardsCollected > curShardsCollected) {
+            if (numShardsCollected == curShardsCollected + 1) {
                 int roomID = (int)goatMemory.GetRoomID();
                 LogWriter.WriteLine("Shard Obtained: {0} -> {1} ({2} -> {3})", this.collectedShards, numShardsCollected, this.lastRoomID, roomID);
                 this.lastRoomID = roomID;
             }
 
             this.collectedShards = numShardsCollected;
-            return (numShardsCollected > curShardsCollected);
+            return (numShardsCollected == curShardsCollected + 1);
         }
     }
 }
