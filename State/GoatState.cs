@@ -53,6 +53,7 @@ namespace LiveSplit.EscapeGoat2.State
 
         public int exceptionsCaught = 0;
         public int totalExceptionsCaught = 0;
+        private ulong pulseCount = 0;
 
         private int positionChangedSanity = 30;
         private int timeSinceSanity = 30;
@@ -80,6 +81,7 @@ namespace LiveSplit.EscapeGoat2.State
 
             this.exceptionsCaught = 0;
             this.totalExceptionsCaught = 0;
+            this.pulseCount = 0;
         }
 
         public void Dispose() {
@@ -103,14 +105,14 @@ namespace LiveSplit.EscapeGoat2.State
                 if (this.exceptionsCaught < 10 && this.totalExceptionsCaught < 30) {
                     this.exceptionsCaught++;
                     this.totalExceptionsCaught++;
-                    LogWriter.WriteLine("Exception #{0}: {1}", this.exceptionsCaught, e.ToString());
+                    LogWriter.WriteLine("Exception #{0} (P:{2}): {1}", this.exceptionsCaught, e.ToString(), this.pulseCount);
                 } else if (this.totalExceptionsCaught < 30) {
-                    LogWriter.WriteLine("Too many exceptions, rebooting autosplitter.");
+                    LogWriter.WriteLine("Too many exceptions, rebooting autosplitter. (P:{0})", this.pulseCount);
                     this.goatMemory.Dispose();
                     this.goatMemory = new GoatMemory();
                     this.exceptionsCaught = 0;
                 } else if (this.totalExceptionsCaught == 30) {
-                    LogWriter.WriteLine("Too many total exceptions, no longer logging them.");
+                    LogWriter.WriteLine("Too many total exceptions, no longer logging them. (P:{0})", this.pulseCount);
                     this.totalExceptionsCaught++;
                 }
             }
@@ -128,6 +130,8 @@ namespace LiveSplit.EscapeGoat2.State
         }
 
         public void Pulse() {
+            this.pulseCount++;
+
             // If we haven't detected the start of a new game, check the memory
             // for the event
             if (!this.isStarted) UpdateStartOfGame();
@@ -212,7 +216,7 @@ namespace LiveSplit.EscapeGoat2.State
             // If the DoorState is clear and we have a paused replay timer, then set the DoorEnteredState to Entering
             if (this.doorEnteredState == DoorState.Clear && replayPaused.Value) {
                 int roomID = (int)goatMemory.GetRoomID();
-                LogWriter.WriteLine("Door Entered (Last Exit {0}, This Exit {1})", this.lastRoomID, roomID);
+                LogWriter.WriteLine("Door Entered (Last Exit {0}, This Exit {1}) (P:{2})", this.lastRoomID, roomID, this.pulseCount);
 
                 this.lastRoomID = roomID;
                 this.hasPositionChangedSinceExit = false;
@@ -222,7 +226,7 @@ namespace LiveSplit.EscapeGoat2.State
 
             // If we are not already Clear but recording a replay, then set the DoorEnteredState to Clear
             else if (this.doorEnteredState != DoorState.Clear && !replayPaused.Value) {
-                LogWriter.WriteLine("Resetting Door State for Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
+                LogWriter.WriteLine("Resetting Door State for Room {1} (Last Exit {0}) (P:{2})", this.lastRoomID, (int)goatMemory.GetRoomID(), this.pulseCount);
 
                 this.doorEnteredState = DoorState.Clear;
             }
@@ -238,33 +242,33 @@ namespace LiveSplit.EscapeGoat2.State
 
             // If we are currently Outside, but we are recording a replay, transition to Inside
             if (levelState == LevelState.Outside && !replayPaused.Value) {
-                LogWriter.WriteLine("Entering Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
+                LogWriter.WriteLine("Entering Room {1} (Last Exit {0}) (P:{2})", this.lastRoomID, (int)goatMemory.GetRoomID(), this.pulseCount);
 
                 this.levelState = LevelState.Inside;
             }
                 // If we are currently Inside, but not recording a replay, transition to Outside
             else if (levelState == LevelState.Inside && replayPaused.Value) {
-                LogWriter.WriteLine("Leaving Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
+                LogWriter.WriteLine("Leaving Room {1} (Last Exit {0}) (P:{2})", this.lastRoomID, (int)goatMemory.GetRoomID(), this.pulseCount);
 
                 this.levelState = LevelState.Outside;
             }
         }
 
         public void UpdatePlayerStatus() {
-            // This checks when the Goat player object exists. It is set to True when entering the first room, 
+            // This checks when the Goat player object exists. It is set to True when entering the first room,
             // and is set to False when the player dies. It is set to True again once respawned.
             bool? player = goatMemory.GetIsPlayerObject();
             if (!player.HasValue) return;
 
             // If we are currently Alive, but there is no player object, transition to Dead
             if (this.playerState == PlayerState.Alive && !player.Value) {
-                LogWriter.WriteLine("Player Object Destroyed in Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
+                LogWriter.WriteLine("Player Object Destroyed in Room {1} (Last Exit {0}) (P:{2})", this.lastRoomID, (int)goatMemory.GetRoomID(), this.pulseCount);
                 this.playerState = PlayerState.Dead;
             }
 
             // If we are currently Dead, but there is a Player object, transition to Alive
             else if (this.playerState == PlayerState.Dead && player.Value) {
-                LogWriter.WriteLine("Player Object Created in Room {1} (Last Exit {0})", this.lastRoomID, (int)goatMemory.GetRoomID());
+                LogWriter.WriteLine("Player Object Created in Room {1} (Last Exit {0}) (P:{2})", this.lastRoomID, (int)goatMemory.GetRoomID(), this.pulseCount);
                 this.playerState = PlayerState.Alive;
             }
         }
@@ -285,10 +289,11 @@ namespace LiveSplit.EscapeGoat2.State
             if (this.currentPosition._x != x || this.currentPosition._y != y) {
                 // Sanity check position is sensical.
                 if (x >= 0 && x <= this.positionChangedSanity && y >= 0 && y <= this.positionChangedSanity) {
-                    LogWriter.WriteLine("Player Position Changed in Room {1} ({2},{3} to {4},{5}) (Last Exit {0})",
+                    LogWriter.WriteLine("Player Position Changed in Room {1} ({2},{3} to {4},{5}) (Last Exit {0}) (P:{6})",
                             this.lastRoomID, (int)goatMemory.GetRoomID(),
                             this.currentPosition._x, this.currentPosition._y,
-                            x, y);
+                            x, y,
+                            this.pulseCount);
                     this.currentPosition = pos.Value;
                     this.hasPositionChangedSinceExit = true;
                 }
@@ -303,7 +308,9 @@ namespace LiveSplit.EscapeGoat2.State
             // Check if we have more sheep orbs than we used to
             if (numSheepOrbsCollected == curSheepOrbsCollected + 1) {
                 int roomID = (int)goatMemory.GetRoomID();
-                LogWriter.WriteLine("Sheep Orb Obtained: {0} -> {1} ({2} -> {3})", this.collectedSheepOrbs, numSheepOrbsCollected, this.lastRoomID, roomID);
+                LogWriter.WriteLine("Sheep Orb Obtained: {0} -> {1} ({2} -> {3}) (P:{4})",
+                        this.collectedSheepOrbs, numSheepOrbsCollected,
+                        this.lastRoomID, roomID, this.pulseCount);
                 this.lastRoomID = roomID;
             }
 
@@ -320,7 +327,10 @@ namespace LiveSplit.EscapeGoat2.State
             // Check if we have more glass fragments than we used to
             if (numShardsCollected == curShardsCollected + 1) {
                 int roomID = (int)goatMemory.GetRoomID();
-                LogWriter.WriteLine("Shard Obtained: {0} -> {1} ({2} -> {3})", this.collectedShards, numShardsCollected, this.lastRoomID, roomID);
+                LogWriter.WriteLine("Shard Obtained: {0} -> {1} ({2} -> {3}) (P:{4})",
+                        this.collectedShards, numShardsCollected,
+                        this.lastRoomID, roomID,
+                        this.pulseCount);
                 this.lastRoomID = roomID;
             }
 
