@@ -54,6 +54,9 @@ namespace LiveSplit.EscapeGoat2.State
         public int exceptionsCaught = 0;
         public int totalExceptionsCaught = 0;
 
+        private int positionChangedSanity = 30;
+        private int timeSinceSanity = 30;
+
         public GoatState() {
             map = new WorldMap();
             goatMemory = new GoatMemory();
@@ -182,7 +185,7 @@ namespace LiveSplit.EscapeGoat2.State
             TimeSpan now = goatMemory.GetGameTime();
 
             // Sanity check, do not update time if it is a huge jump.
-            if (now < this.lastSeen || now - this.lastSeen > TimeSpan.FromSeconds(2)) return;
+            if (now < this.lastSeen || now - this.lastSeen > TimeSpan.FromSeconds(this.timeSinceSanity)) return;
 
             // Call all the relevant IGT based events depending on the time delta since the last pulse.
             if (this.OnTimerUpdated != null) this.OnTimerUpdated(now, EventArgs.Empty);
@@ -281,7 +284,7 @@ namespace LiveSplit.EscapeGoat2.State
             // Check if the current position has changed
             if (this.currentPosition._x != x || this.currentPosition._y != y) {
                 // Sanity check position is sensical.
-                if (x >= 0 && x <= 25 && y >= 0 && y <= 25) {
+                if (x >= 0 && x <= this.positionChangedSanity && y >= 0 && y <= this.positionChangedSanity) {
                     LogWriter.WriteLine("Player Position Changed in Room {1} ({2},{3} to {4},{5}) (Last Exit {0})",
                             this.lastRoomID, (int)goatMemory.GetRoomID(),
                             this.currentPosition._x, this.currentPosition._y,
