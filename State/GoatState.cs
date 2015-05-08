@@ -275,12 +275,20 @@ namespace LiveSplit.EscapeGoat2.State
             MapPosition? pos = goatMemory.GetCurrentPosition();
             if (!pos.HasValue) return;
 
+            int x = pos.Value._x;
+            int y = pos.Value._y;
+
             // Check if the current position has changed
-            if (this.currentPosition._x != pos.Value._x || this.currentPosition._y != pos.Value._y) {
-                LogWriter.WriteLine("Player Position Changed in Room {1} ({2},{3} to {4},{5}) (Last Exit {0})",
-                        this.lastRoomID, (int)goatMemory.GetRoomID(), this.currentPosition._x, this.currentPosition._y, pos.Value._x, pos.Value._y);
-                this.currentPosition = pos.Value;
-                this.hasPositionChangedSinceExit = true;
+            if (this.currentPosition._x != x || this.currentPosition._y != y) {
+                // Sanity check position is sensical.
+                if (x >= 0 && x <= 25 && y >= 0 && y <= 25) {
+                    LogWriter.WriteLine("Player Position Changed in Room {1} ({2},{3} to {4},{5}) (Last Exit {0})",
+                            this.lastRoomID, (int)goatMemory.GetRoomID(),
+                            this.currentPosition._x, this.currentPosition._y,
+                            x, y);
+                    this.currentPosition = pos.Value;
+                    this.hasPositionChangedSinceExit = true;
+                }
             }
         }
 

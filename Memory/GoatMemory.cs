@@ -70,13 +70,16 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public MapPosition? GetCurrentPosition() {
-            // The current map position is located in the `GameState` in the `ActionStage`. We can
-            // read the x,y coordinate of the current room, allowing us to determine when room 
-            // changes have occured. This position changes at the end of a room to the next 
-            // appropriate room whether you later change rooms using the map. This position is used
-            // to sanity check when a user has left a room. This is to resolve rare issues where
-            // `_pauseReplayRecording` would toggle (likely due to reading memory just as it is 
-            // being freed/moved) causing additional splits.
+            // The current map position is located in the `GameState` in the
+            // `ActionStage`. We can read the x,y coordinate of the current
+            // room, allowing us to determine when room changes have occured.
+            // This position changes at the end of a room to the next
+            // appropriate room whether you later change rooms using the map.
+            // This position is used to sanity check when a user has left a
+            // room. This is to resolve rare issues where
+            // `_pauseReplayRecording` would toggle (likely due to reading
+            // memory just as it is being freed/moved) causing additional
+            // splits.
             var action = GetActionStage();
             var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
             if (!state.HasValue) return null;
@@ -88,9 +91,10 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public int? GetSheepOrbsCollected() {
-            // We determine the end of Sheep Orb rooms by detecting an increase in the number of
-            // Sheep Orbs collected. We do this simply by reading the length of the `_orbObtainedPositions`
-            // located in the `GameState`.
+            // We determine the end of Sheep Orb rooms by detecting an increase
+            // in the number of Sheep Orbs collected. We do this simply by
+            // reading the length of the `_orbObtainedPositions` located in the
+            // `GameState`.
             var action = GetActionStage();
             var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
             if (!state.HasValue) return null;
@@ -100,9 +104,11 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public int? GetShardsCollected() {
-            // We determine the end of Glass Fragments rooms by detecting an increase in the number of
-            // Glass Framents collected. Internally these fragments are called shards, and we actually 
-            // count them by reading the length of the `_secretRoomsBeaten` array located in the `GameState`.
+            // We determine the end of Glass Fragments rooms by detecting an
+            // increase in the number of Glass Framents collected. Internally
+            // these fragments are called shards, and we actually count them by
+            // reading the length of the `_secretRoomsBeaten` array located in
+            // the `GameState`.
             var action = GetActionStage();
             var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
             if (!state.HasValue) return null;
@@ -112,10 +118,11 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public TimeSpan GetGameTime() {
-            // To use In-Game time inside LiveSplit we read the value of the In-Game time directly from
-            // the `GameState`. `_totalTime` is a TimeSpan, which internally is a struct that stores a 
-            // Int64 with the number of "ticks". We therefore read this value as an Int64 and then create
-            // a new TimeSpan object using that value.
+            // To use In-Game time inside LiveSplit we read the value of the
+            // In-Game time directly from the `GameState`. `_totalTime` is a
+            // TimeSpan, which internally is a struct that stores a Int64 with
+            // the number of "ticks". We therefore read this value as an Int64
+            // and then create a new TimeSpan object using that value.
             try {
                 var action = GetActionStage();
                 var state = GetCachedValuePointer(action, "<GameState>k__BackingField");
@@ -159,9 +166,9 @@ namespace LiveSplit.EscapeGoat2.Memory
 
             // Once we have the process, we also need to hook the `ProcessMangler`. This basically
             // just detects the version of the .NET runtime that the process it running under and
-            // initialises the objects required for us to read from the process Heap and Runtime. 
-            
-            // If you try and initialize the `ProcessMangler` onto the process too quickly after 
+            // initialises the objects required for us to read from the process Heap and Runtime.
+
+            // If you try and initialize the `ProcessMangler` onto the process too quickly after
             // opening the game, it will cause all sorts of problems. These are resolved simply
             // by waiting two seconds between hooking the process and starting the `ProcessMangler`
             // leaving ample time for the process to initialise before starting to read from it.
