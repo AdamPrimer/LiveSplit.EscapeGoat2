@@ -188,8 +188,16 @@ namespace LiveSplit.EscapeGoat2.State
         public void UpdateGameTime() {
             TimeSpan now = goatMemory.GetGameTime();
 
-            // Sanity check, do not update time if it is a huge jump.
-            if (now < this.lastSeen || now - this.lastSeen <= DateTime.Now - this.lastSaneTime) return;
+            // Due to the fact we are polling memory, and only at around 30HZ while the 
+            // time runs at 60HZ, there is a variance of 1 frame on the times we get 
+            // from the game. (now - this.lastSeen) therefore tends to vary from 1 frame
+            // in magnitude, to 3 frames in magnitude. Given the polling period is just over
+            // two frames, this means only when we get the three frame window do we observe
+            // In-Game Time ahead of real time. We can therefore sometimes be up to a frame
+            // ahead of real time without an error having occured. Although this only
+            // requires ~17ms of delay, I have allowed 50ms (three frames) of delay just
+            // in case something wacky happens.
+            if (now < this.lastSeen || now - this.lastSeen > (DateTime.Now - this.lastSaneTime).Add(TimeSpan.FromMilliseconds(50))) return;
 
             this.lastSaneTime = DateTime.Now;
 
