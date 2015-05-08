@@ -1,5 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+  <update version="0.9.6">
+    <files>
+      <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
+    </files>
+    <changelog>
+      <change>
+        Fixed pointer cache unloading in the case of Exception.
+      </change>
+      <change>
+        Added sanity checks to map position changes and improved the sanity checks performed on the in-game time.
+      </change>
+    </changelog>
+  </update>
   <update version="0.9.5">
     <files>
       <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
