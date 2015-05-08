@@ -111,29 +111,39 @@ namespace LiveSplit.EscapeGoat2.State
                     this.totalExceptionsCaught++;
                 }
             }
+
+            // We cache memory pointers during each pulse inside goatMemory for
+            // performance reasons, we need to manually clear the cache here so
+            // that goatMemory knows we are done making calls to it and that we
+            // do not need these values anymore.
+            //
+            // We need this to occur even if (actually, especially if) and
+            // exception occurs to clear any potentially dead memory pointers
+            // that occured due to reading memory just as it's being
+            // moved/freed.
+            goatMemory.ClearCaches();
         }
 
         public void Pulse() {
-            // If we haven't detected the start of a new game, check the memory for the event
+            // If we haven't detected the start of a new game, check the memory
+            // for the event
             if (!this.isStarted) UpdateStartOfGame();
 
-            // If we have detected the start of a game, then check for end of level events and updated in-game time.
+            // If we have detected the start of a game, then check for end of
+            // level events and updated in-game time.
             if (this.isStarted) {
                 UpdateEndOfLevel();
                 UpdateGameTime();
             }
 
-            // We cache memory pointers during each pulse inside goatMemory for performance reasons,
-            // we need to manually clear the cache here so that goatMemory knows we are done making
-            // calls to it and that we do not need these values anymore.
             goatMemory.ClearCaches();
         }
 
         public void UpdateEndOfLevel() {
-            // All of our checks are dependent on there being an active room available. 
-            // This requires both the RoomInstance to be available, and that we are on 
-            // the "ActionStage" in the SceneManager indicating that the RoomInstance 
-            // is the active scene.
+            // All of our checks are dependent on there being an active room
+            // available.  This requires both the RoomInstance to be available,
+            // and that we are on the "ActionStage" in the SceneManager
+            // indicating that the RoomInstance is the active scene.
             var roomInstance = goatMemory.GetRoomInstance();
             bool isOnAction  = (bool)goatMemory.GetOnActionStage();
 
@@ -149,8 +159,9 @@ namespace LiveSplit.EscapeGoat2.State
                 bool newSheepOrb  = (bool)HaveCollectedNewSheepOrb();
                 bool newShard     = (bool)HaveCollectedNewShard();
 
-                // A room ends on one of three conditions, a door is entered, a glass fragment (shard) 
-                // is collected, or a sheep orb is collected.
+                // A room ends on one of three conditions, a door is entered, a
+                // glass fragment (shard) is collected, or a sheep orb is
+                // collected.
                 if (newDoor || newSheepOrb || newShard) {
                     int roomID = (int)goatMemory.GetRoomID();
                     goatTriggers.SplitOnEndRoom(this.map.GetRoom(roomID));
@@ -186,8 +197,9 @@ namespace LiveSplit.EscapeGoat2.State
         }
 
         public bool HaveEnteredDoor() {
-            // If we haven't updated our map position since the last exit, then we don't want to trigger another
-            // exit. This is to prevent issues with double splitting.
+            // If we haven't updated our map position since the last exit, then
+            // we don't want to trigger another exit. This is to prevent issues
+            // with double splitting.
             if (!this.hasPositionChangedSinceExit) return false;
 
             // We detect a room exit by seeing it the ReplayRecordingPaused is set to True
