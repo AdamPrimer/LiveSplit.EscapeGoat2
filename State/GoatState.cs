@@ -46,6 +46,7 @@ namespace LiveSplit.EscapeGoat2.State
         public int collectedSheepOrbs = 0;                              // The number of collected Sheep Orbs
 
         public TimeSpan lastSeen = TimeSpan.Zero;                       // The last time the player was seen (in In-Game Time)
+        private DateTime lastSaneTime = DateTime.Now;
 
         public event EventHandler OnTimerFixed;                         // Fires whenever the IGT between updates has not changed
         public event EventHandler OnTimerChanged;                       // Fires whenever the IGT between updates has changed
@@ -56,7 +57,6 @@ namespace LiveSplit.EscapeGoat2.State
         private ulong pulseCount = 0;
 
         private int positionChangedSanity = 30;
-        private int timeSinceSanity = 30;
 
         public GoatState() {
             map = new WorldMap();
@@ -189,7 +189,9 @@ namespace LiveSplit.EscapeGoat2.State
             TimeSpan now = goatMemory.GetGameTime();
 
             // Sanity check, do not update time if it is a huge jump.
-            if (now < this.lastSeen || now - this.lastSeen > TimeSpan.FromSeconds(this.timeSinceSanity)) return;
+            if (now < this.lastSeen || now - this.lastSeen <= DateTime.Now - this.lastSaneTime) return;
+
+            this.lastSaneTime = DateTime.Now;
 
             // Call all the relevant IGT based events depending on the time delta since the last pulse.
             if (this.OnTimerUpdated != null) this.OnTimerUpdated(now, EventArgs.Empty);
