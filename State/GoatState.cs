@@ -195,9 +195,18 @@ namespace LiveSplit.EscapeGoat2.State
             // two frames, this means only when we get the three frame window do we observe
             // In-Game Time ahead of real time. We can therefore sometimes be up to a frame
             // ahead of real time without an error having occured. Although this only
-            // requires ~17ms of delay, I have allowed 50ms (three frames) of delay just
+            // requires ~17ms of delay, I have allowed 500ms (thirty frames) of delay just
             // in case something wacky happens.
-            if (now < this.lastSeen || now - this.lastSeen > (DateTime.Now - this.lastSaneTime).Add(TimeSpan.FromMilliseconds(50))) return;
+            if (now < this.lastSeen) return;
+            
+            if (now - this.lastSeen > (DateTime.Now - this.lastSaneTime).Add(TimeSpan.FromMilliseconds(500))) {
+                LogWriter.WriteLine("Invalid Time: ({0} {1}) ({2} {3}) ({4} {5}) (P:{6})", 
+                    now, this.lastSeen, 
+                    DateTime.Now, this.lastSaneTime, 
+                    now - this.lastSeen, DateTime.Now - this.lastSaneTime, 
+                    this.pulseCount);
+                return;
+            }
 
             this.lastSaneTime = DateTime.Now;
 

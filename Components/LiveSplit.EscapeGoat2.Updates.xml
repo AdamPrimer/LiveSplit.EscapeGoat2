@@ -1,5 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+  <update version="0.9.7">
+    <files>
+      <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
+    </files>
+    <changelog>
+      <change>
+        Increased window on in-game time sanity check as the original appeared insufficient in some circumstances.
+      </change>
+    </changelog>
+  </update>
   <update version="0.9.6">
     <files>
       <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
