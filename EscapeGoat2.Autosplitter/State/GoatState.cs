@@ -93,6 +93,7 @@ namespace LiveSplit.EscapeGoat2.State
             try {
                 // Hook the game process so we can read the memory
                 bool isNowOpen = (goatMemory.HookProcess() && !goatMemory.proc.HasExited);
+
                 if (isNowOpen != isOpen) {
                     if (!isNowOpen) LogWriter.WriteLine("escapegoat2.exe is unavailable.");
                     else LogWriter.WriteLine("escapegoat2.exe is available.");

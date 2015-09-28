@@ -1,5 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+  <update version="0.9.8">
+    <files>
+      <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
+      <file path="Components/EscapeGoat2.Autosplitter.exe" status="changed"/>
+    </files>
+    <changelog>
+      <change>
+        Updated to work with LiveSplit 1.6.
+      </change>
+    </changelog>
+  </update>
   <update version="0.9.7">
     <files>
       <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
