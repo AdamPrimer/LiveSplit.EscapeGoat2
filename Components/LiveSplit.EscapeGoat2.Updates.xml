@@ -1,5 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+  <update version="0.9.12">
+    <files>
+      <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
+      <file path="Components/EscapeGoat2.Autosplitter.exe" status="changed"/>
+    </files>
+    <changelog>
+      <change>
+        LiveSplit will no longer crash if EscapeGoat2.Autosplitter.exe exits while LiveSplit is open.
+      </change>
+    </changelog>
+  </update>
   <update version="0.9.11">
     <files>
       <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>

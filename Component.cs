@@ -42,21 +42,23 @@ namespace LiveSplit.EscapeGoat2
             process.OutputDataReceived += new DataReceivedEventHandler
             (
                 delegate(object sender, DataReceivedEventArgs e) {
-                    string line = e.Data.ToString();
-                    string[] cmd = line.Split();
+                    if (!String.IsNullOrEmpty(e.Data)) {
+                        string line = e.Data.ToString();
+                        string[] cmd = line.Split();
 
-                    if (cmd[0] == "Start") {
-                        DoStart();
-                    } else if (cmd[0] == "Split") {
-                        DoSplit();
-                    } else if (cmd[0] == "IGT") {
-                        if (cmd[1] != "Fixed") {
-                            _state.SetGameTime(TimeSpan.Parse(cmd[1]));
-                            _state.IsGameTimePaused = true;
+                        if (cmd[0] == "Start") {
+                            DoStart();
+                        } else if (cmd[0] == "Split") {
+                            DoSplit();
+                        } else if (cmd[0] == "IGT") {
+                            if (cmd[1] != "Fixed") {
+                                _state.SetGameTime(TimeSpan.Parse(cmd[1]));
+                                _state.IsGameTimePaused = true;
+                            }
                         }
-                    }
 
-                    //LogWriter.WriteLine("stdout {0}", line);
+                        //LogWriter.WriteLine("stdout {0}", line);
+                    }
                 }
             );
 
@@ -65,10 +67,12 @@ namespace LiveSplit.EscapeGoat2
         }
 
         public override void Dispose() {
-            process.CancelOutputRead();
-            process.CloseMainWindow();
-            process.Kill();
-            process.Close();
+            if (process != null && !process.HasExited) {
+                process.CancelOutputRead();
+                process.CloseMainWindow();
+                process.Kill();
+                process.Close();
+            }
 
             if (Model != null) {
                 Model.CurrentState.OnReset -= OnReset;

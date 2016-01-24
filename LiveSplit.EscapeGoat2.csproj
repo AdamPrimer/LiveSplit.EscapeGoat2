@@ -76,7 +76,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LiveSplit.Core">
+    <Reference Include="LiveSplit.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Users\Adam\Downloads\LiveSplit_1.6.2\LiveSplit.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
