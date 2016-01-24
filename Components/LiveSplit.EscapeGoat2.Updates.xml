@@ -1,5 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <updates>
+  <update version="0.9.11">
+    <files>
+      <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
+      <file path="Components/EscapeGoat2.Autosplitter.exe" status="changed"/>
+      <file path="Components/Microsoft.Diagnostics.Runtime.dll" status="changed"/>
+    </files>
+    <changelog>
+      <change>
+        Seriously, it should work with .NET Framework 4.6 this time, the last update didn't include the diagnostics runtime.
+      </change>
+      <change>
+        Explictly adding the new Microsoft.Diagnostics.Runtime.dll to the auto-update procedure.
+      </change>
+    </changelog>
+  </update>
   <update version="0.9.10">
     <files>
       <file path="Components/LiveSplit.EscapeGoat2.dll" status="changed"/>
