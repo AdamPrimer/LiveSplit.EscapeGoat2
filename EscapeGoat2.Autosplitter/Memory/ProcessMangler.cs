@@ -17,10 +17,7 @@ namespace LiveSplit.EscapeGoat2.Memory
 
         public ProcessMangler(int processId) {
             DataTarget = DataTarget.AttachToProcess(processId, AttachTimeout, AttachMode);
-            var dac = DataTarget.ClrVersions.First().TryGetDacLocation();
-            if (dac == null)
-                throw new Exception("// Couldn't get DAC location.");
-            Runtime = DataTarget.CreateRuntime(dac);
+            Runtime = DataTarget.ClrVersions.First().CreateRuntime();
             Heap = Runtime.GetHeap();
         }
 
@@ -40,7 +37,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         private IEnumerable<ValuePointer> AllValuesOfType(IEnumerable<ClrType> types) {
             var hs = new HashSet<int>(from t in types select t.Index);
 
-            return from o in Heap.EnumerateObjects()
+            return from o in Heap.EnumerateObjectAddresses()
                    let t = Heap.GetObjectType(o)
                    where hs.Contains(t.Index)
                    select new ValuePointer(o, t, Heap);

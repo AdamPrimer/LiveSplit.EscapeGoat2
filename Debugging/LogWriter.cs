@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using Microsoft.Diagnostics.Runtime;
 
 namespace LiveSplit.EscapeGoat2.Debugging
 {

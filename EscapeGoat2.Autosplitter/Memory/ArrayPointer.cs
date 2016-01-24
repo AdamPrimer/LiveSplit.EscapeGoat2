@@ -60,7 +60,7 @@ namespace LiveSplit.EscapeGoat2.Memory
             ClrType type = Heap.GetObjectType(Value.Address);
 
             // Only consider types which are arrays that do not have simple values (I.E., are structs).
-            if (!type.IsArray || type.ArrayComponentType.HasSimpleValue) {
+            if (!type.IsArray || type.ComponentType.HasSimpleValue) {
                 return null;
             }
 
@@ -74,7 +74,7 @@ namespace LiveSplit.EscapeGoat2.Memory
                 ulong addr = type.GetArrayElementAddress(Value.Address, i);
 
                 T item = new T();
-                foreach (var field in type.ArrayComponentType.Fields) {
+                foreach (var field in type.ComponentType.Fields) {
                     if (!field.HasSimpleValue) continue;
 
                     for (int j = 0; j < fields.Length; j++) {
