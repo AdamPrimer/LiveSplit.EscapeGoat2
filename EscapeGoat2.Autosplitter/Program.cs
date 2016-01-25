@@ -15,7 +15,8 @@ namespace EscapeGoat2.Autosplitter
     class Program
     {
         public static GoatState goatState;
-        private const int TARGET_UPDATE_RATE = 13;
+        private const int TARGET_UPDATE_RATE = 17;
+        private static int cTimeFixed = 0;
 
         static void Main(string[] args) {
             LogWriter.WriteLine("[GoatSplitter] Launched");
@@ -26,6 +27,7 @@ namespace EscapeGoat2.Autosplitter
 
             // Hook into the in-game timer updates
             goatState.OnTimerFixed += goatState_OnIGTFixed;
+            goatState.OnTimerChanged += goatState_OnIGTChanged;
             goatState.OnTimerUpdated += goatState_OnIGTUpdated;
 
             new Thread(new ThreadStart(ReceiveCommands)).Start();
@@ -81,7 +83,15 @@ namespace EscapeGoat2.Autosplitter
         }
 
         static void goatState_OnIGTFixed(object sender, EventArgs e) {
-            Console.WriteLine("IGT Fixed");
+            if (cTimeFixed > 3) {
+                Console.WriteLine("IGT Fixed");
+            } else {
+                cTimeFixed = cTimeFixed + 1;
+            }
+        }
+
+        static void goatState_OnIGTChanged(object sender, EventArgs e) {
+            cTimeFixed = 0;
         }
 
         static void goatState_OnIGTUpdated(object sender, EventArgs e) {
