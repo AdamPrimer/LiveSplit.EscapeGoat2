@@ -12,8 +12,6 @@ namespace LiveSplit.EscapeGoat2
 {
     public class EscapeGoat2Component : LogicComponent
     {
-        //public EscapeGoat2Settings Settings { get; set; }
-
         public override string ComponentName {
             get { return "Escape Goat 2 Auto Splitter"; }
         }
@@ -54,10 +52,10 @@ namespace LiveSplit.EscapeGoat2
                             if (cmd[1] != "Fixed") {
                                 _state.SetGameTime(TimeSpan.Parse(cmd[1]));
                                 _state.IsGameTimePaused = true;
+                            } else {
+                                DoEndGameSplit();
                             }
                         }
-
-                        //LogWriter.WriteLine("stdout {0}", line);
                     }
                 }
             );
@@ -125,6 +123,28 @@ namespace LiveSplit.EscapeGoat2
             } else {
                 LogWriter.WriteLine("[GoatSplitter] RTA Last Split, Pausing Timer.");
                 Model.Pause();
+            }
+        }
+
+        public void DoEndGameSplit() {
+            // Escape Goat 2 has two different timing methods. RTA and IGT. RTA timings are stopped
+            // upon entering the last door (final input), while IGT continues for approximately
+            // 2-3 seconds as it stops when the level fades out completely. As a result, we
+            // Pause LiveSplit when the final trigger occurs, this "stops" the RTA timer, but
+            // we can continue to update the IGT timer directly.
+
+            // As the IGT never updates inside live split, we set its value absolutely,
+            // pausing LiveSplit therefore has the effect of "stopping" the RTA timer while
+            // IGT continues.
+
+            // Therefore, if we are on the final split, and we receive the "IGT is the same as
+            // the last time we checked" event, we know that the IGT has stopped for the last time.
+            // We therefore unpause LiveSplit (by calling Pause again) so we can call Split
+            // (this cannot be called while paused) and then perform the final split.
+            if (isLastSplit() && Model.CurrentState.CurrentPhase == TimerPhase.Paused) {
+                LogWriter.WriteLine("[GoatSplitter] IGT Last Split, Stopping Timer.");
+                Model.Pause();
+                Model.Split();
             }
         }
 

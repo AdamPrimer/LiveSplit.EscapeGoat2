@@ -20,7 +20,6 @@ namespace EscapeGoat2.Autosplitter
         static void Main(string[] args) {
             LogWriter.WriteLine("[GoatSplitter] Launched");
             goatState = new GoatState();
-            LogWriter.WriteLine("[GoatSplitter] State Initialized");
 
             // Hook into the split triggers
             goatState.goatTriggers.OnSplit += OnSplitTriggered;
