@@ -200,7 +200,7 @@ namespace LiveSplit.EscapeGoat2.Memory
             string key = string.Format("{0}.{1}", klass, fieldName);
             if (!staticCache.ContainsKey(key)) {
                 try {
-                    staticCache[key] = new StaticField(pm.Runtime, klass, fieldName);
+                    staticCache[key] = new StaticField(pm, klass, fieldName);
                 } catch (Exception e) {
                     LogWriter.WriteLine(key);
                     throw e;
