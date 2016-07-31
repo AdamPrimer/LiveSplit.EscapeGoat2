@@ -15,7 +15,7 @@ namespace EscapeGoat2.Autosplitter
     class Program
     {
         public static GoatState goatState;
-        private const int TARGET_UPDATE_RATE = 17;
+        private const int TARGET_UPDATE_RATE = 1;
         private static int cTimeFixed = 0;
 
         static void Main(string[] args) {
@@ -83,7 +83,7 @@ namespace EscapeGoat2.Autosplitter
         }
 
         static void goatState_OnIGTFixed(object sender, EventArgs e) {
-            if (cTimeFixed > 3) {
+            if (cTimeFixed * TARGET_UPDATE_RATE > 50) {
                 Console.WriteLine("IGT Fixed");
             } else {
                 cTimeFixed = cTimeFixed + 1;
