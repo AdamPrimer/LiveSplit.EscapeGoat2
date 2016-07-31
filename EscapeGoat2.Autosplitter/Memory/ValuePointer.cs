@@ -10,22 +10,22 @@ namespace LiveSplit.EscapeGoat2.Memory
     {
         public readonly ulong Address;
         public readonly ClrType Type;
-        public readonly ClrHeap Heap;
+        public readonly ProcessMangler Mangler;
 
-        public ValuePointer(ClrRoot r, ClrHeap heap) {
+        public ValuePointer(ClrRoot r, ProcessMangler mangler) {
             // r.Address is the memory location of the root, not the thing it points to
             r.Type.Heap.ReadPointer(r.Address, out Address);
             Type = r.Type;
-            Heap = heap;
+            Mangler = mangler;
         }
 
-        public ValuePointer(ulong address, ClrType type, ClrHeap heap) {
+        public ValuePointer(ulong address, ClrType type, ProcessMangler mangler) {
             if (type == null)
                 throw new ArgumentNullException("type");
 
             Address = address;
             Type = type;
-            Heap = heap;
+            Mangler = mangler;
         }
 
         public ValuePointer? this[string fieldName] {
@@ -49,7 +49,7 @@ namespace LiveSplit.EscapeGoat2.Memory
                 if (address == 0)
                     return null;
 
-                return new ValuePointer(address, field.Type, this.Heap);
+                return new ValuePointer(address, field.Type, this.Mangler);
             }
         }
 
@@ -61,11 +61,11 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public ValuePointer ForceCast(ClrType newType) {
-            return new ValuePointer(Address, newType, this.Heap);
+            return new ValuePointer(Address, newType, this.Mangler);
         }
 
         public ValuePointer ForceCast(string newTypeName) {
-            var newType = Type.Heap.GetTypeByName(newTypeName);
+            var newType = Mangler.GetTypeByName(newTypeName);
             if (newType == null)
                 throw new Exception("No type with this name");
 
@@ -80,7 +80,7 @@ namespace LiveSplit.EscapeGoat2.Memory
             ulong address = Address;
             // This is required due to a bug in Microsoft.Diagnostics.Runtime
             if (Type.IsPrimitive) {
-                address -= (ulong)((long)this.Heap.PointerSize);
+                address -= (ulong)((long)this.Mangler.Heap.PointerSize);
             }
 
             return Type.GetValue(address);

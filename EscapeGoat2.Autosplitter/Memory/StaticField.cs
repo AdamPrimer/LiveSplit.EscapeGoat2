@@ -10,20 +10,20 @@ namespace LiveSplit.EscapeGoat2.Memory
     {
         public readonly ClrAppDomain Domain;
         public readonly ClrStaticField Field;
-        public readonly ClrHeap Heap;
+        public readonly ProcessMangler Mangler;
 
-        public StaticField(ClrRuntime runtime, string typee, string name) {
-            Domain = runtime.AppDomains.First();
-            ClrHeap heap = runtime.GetHeap();
-            ClrType type = heap.GetTypeByName(typee);
+        public StaticField(ProcessMangler mangler, string typee, string name) {
+            Domain = mangler.Runtime.AppDomains.First();
+            ClrHeap heap = mangler.Runtime.GetHeap();
+            ClrType type = mangler.GetTypeByName(typee);
             Field = type.GetStaticFieldByName(name);
-            Heap = runtime.GetHeap();
+            Mangler = mangler;
         }
 
-        public StaticField(ClrRuntime runtime, ClrType type, string name) {
-            Domain = runtime.AppDomains.First();
+        public StaticField(ProcessMangler mangler, ClrType type, string name) {
+            Domain = mangler.Runtime.AppDomains.First();
             Field = type.GetStaticFieldByName(name);
-            Heap = runtime.GetHeap();
+            Mangler = mangler;
         }
 
         public ClrType Type {
@@ -54,7 +54,7 @@ namespace LiveSplit.EscapeGoat2.Memory
                 if (address == 0)
                     return null;
 
-                return new ValuePointer(address, Type, this.Heap);
+                return new ValuePointer(address, Type, Mangler);
             }
         }
     }
