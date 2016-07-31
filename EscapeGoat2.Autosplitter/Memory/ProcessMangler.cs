@@ -14,6 +14,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         public readonly DataTarget DataTarget;
         public readonly ClrRuntime Runtime;
         public readonly ClrHeap Heap;
+        private Dictionary<string, ClrType> typeCache = new Dictionary<string, ClrType>();
 
         public ProcessMangler(int processId) {
             DataTarget = DataTarget.AttachToProcess(processId, AttachTimeout, AttachMode);
@@ -40,11 +41,20 @@ namespace LiveSplit.EscapeGoat2.Memory
             return from o in Heap.EnumerateObjectAddresses()
                    let t = Heap.GetObjectType(o)
                    where hs.Contains(t.Index)
-                   select new ValuePointer(o, t, Heap);
+                   select new ValuePointer(o, t, this);
         }
 
         public IEnumerable<ValuePointer> AllValuesOfType(params string[] typeNames) {
-            return AllValuesOfType(from tn in typeNames select Heap.GetTypeByName(tn));
+            return AllValuesOfType(from tn in typeNames select GetTypeByName(tn));
+        }
+
+        public ClrType GetTypeByName(string typename)
+        {
+            if (typeCache.ContainsKey(typename))
+                return typeCache[typename];
+            ClrType ret = Heap.GetTypeByName(typename);
+            typeCache[typename] = ret;
+            return ret;
         }
 
         public ValuePointer? this[ulong address] {
@@ -53,7 +63,7 @@ namespace LiveSplit.EscapeGoat2.Memory
                 if (t == null)
                     return null;
 
-                return new ValuePointer(address, t, Heap);
+                return new ValuePointer(address, t, this);
             }
         }
 

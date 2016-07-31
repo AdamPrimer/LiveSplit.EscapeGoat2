@@ -10,14 +10,14 @@ namespace LiveSplit.EscapeGoat2.Memory
     {
         public readonly ValuePointer Value;
         public readonly ClrType ElementType;
-        public readonly ClrHeap Heap;
+        public readonly ProcessMangler Mangler;
         public readonly int Length;
         public readonly bool HasLength;
 
         public ArrayPointer(ValuePointer value, ClrType elementType) {
             Value = value;
             ElementType = elementType;
-            Heap = elementType.Heap;
+            Mangler = value.Mangler;
             Length = 0;
             HasLength = false;
         }
@@ -25,16 +25,17 @@ namespace LiveSplit.EscapeGoat2.Memory
         public ArrayPointer(ValuePointer value, ClrType elementType, int length) {
             Value = value;
             ElementType = elementType;
-            Heap = elementType.Heap;
+            Mangler = value.Mangler;
             Length = length;
             HasLength = true;
         }
 
         // Initialize from System.Collections.Generic.List
         public ArrayPointer(ValuePointer state, string fieldName, string fieldType) {
-            var tList =  state.Heap.GetTypeByName("System.Collections.Generic.List<T>") // CLR 4.x
-                         ?? 
-                         state.Heap.GetTypeByName("System.Collections.Generic.List`1"); // CLR 2.x
+            Mangler = state.Mangler;
+            var tList =  Mangler.GetTypeByName("System.Collections.Generic.List<T>") // CLR 4.x
+                         ??
+                         Mangler.GetTypeByName("System.Collections.Generic.List`1"); // CLR 2.x
 
             var list = state[fieldName];
             if (!list.HasValue) {
@@ -44,8 +45,7 @@ namespace LiveSplit.EscapeGoat2.Memory
             var listList = list.Value.ForceCast(tList);
 
             Value = listList["_items"].Value.ForceCast("System.Object[]");
-            ElementType = state.Heap.GetTypeByName(fieldType);
-            Heap = state.Heap;
+            ElementType = Mangler.GetTypeByName(fieldType);
             Length = listList.GetFieldValue<Int32>("_size");
             HasLength = true;
         }
@@ -57,7 +57,7 @@ namespace LiveSplit.EscapeGoat2.Memory
         }
 
         public List<T> Read<T>() where T : new() {
-            ClrType type = Heap.GetObjectType(Value.Address);
+            ClrType type = Mangler.Heap.GetObjectType(Value.Address);
 
             // Only consider types which are arrays that do not have simple values (I.E., are structs).
             if (!type.IsArray || type.ComponentType.HasSimpleValue) {
@@ -100,7 +100,7 @@ namespace LiveSplit.EscapeGoat2.Memory
 
                 var elementType = ElementType.Heap.GetObjectType(address);
                 if (elementType != null)
-                    return new ValuePointer(address, ElementType, this.Heap);
+                    return new ValuePointer(address, ElementType, Mangler);
                 else {
                     return null;
                 }
